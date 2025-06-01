@@ -10,12 +10,15 @@ cmake-build-*/
 proompts/
 
 # IDE specific files
+.cursor/
 .vscode/
+*.code-workspace
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+Thumbs.db
 
 # Compiled Object files
 *.slo
@@ -73,3 +76,19 @@ doxygen/
 *.tmp
 *.temp
 *.log
+logs/
+.cache/
+
+# Environment
+.env
+.env.local
+
+# Testing
+coverage/
+.coverage
+.pytest_cache/
+
+# Python
+venv/
+__pycache__/
+*.egg-info/
