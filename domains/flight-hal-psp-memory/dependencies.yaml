@@ -1,0 +1,15 @@
+team_info:
+  name: "PSP Memory Team"
+  purpose: "Implement PSP memory management (32/64MB RAM, Media Engine RAM)"
+  
+dependencies:
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocator interface"
+      - "Memory region definitions"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "PSP platform detection"
+      - "Error types"

@@ -1,0 +1,55 @@
+// Core Memory Types - Fundamental abstractions
+package flight:memory@0.1.0;
+
+interface core {
+  // Size representation with human-readable format
+  record memory-size {
+    bytes: u64,
+    human-readable: string,  // "2MB", "512KB", etc.
+  }
+  
+  // Memory address with optional region reference
+  record memory-address {
+    value: u64,
+    region: option<string>,  // Which memory region this belongs to
+  }
+  
+  // Alignment requirements
+  record memory-alignment {
+    boundary: u32,      // Alignment boundary (4, 8, 16, 4096, etc.)
+    required: bool,     // Whether alignment is mandatory
+  }
+  
+  // Address range for bounds checking
+  record memory-range {
+    start: memory-address,
+    end: memory-address,
+  }
+  
+  // Access permissions
+  flags access-flags {
+    read,     // Can read from memory
+    write,    // Can write to memory
+    execute,  // Can execute code from memory
+  }
+  
+  // Common memory units for convenience
+  enum memory-unit {
+    bytes,
+    kilobytes,
+    megabytes,
+    gigabytes,
+  }
+  
+  // Helper functions for memory size operations
+  create-size: func(value: u64, unit: memory-unit) -> memory-size;
+  
+  add-sizes: func(a: memory-size, b: memory-size) -> memory-size;
+  
+  // Check if size fits within limit
+  size-fits: func(size: memory-size, limit: memory-size) -> bool;
+  
+  // Format helpers
+  format-size: func(bytes: u64) -> string;
+  parse-size: func(text: string) -> result<memory-size, string>;
+}

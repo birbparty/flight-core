@@ -1,0 +1,18 @@
+team_info:
+  name: "Windows D3D12 Team"
+  purpose: "Implement DirectX 12 graphics backend"
+  
+dependencies:
+  - project: "flight-hal-graphics-interface"
+    team: "HAL Graphics Interface Team"
+    features:
+      - "Graphics context interface"
+      - "Command buffer abstraction"
+  - project: "flight-hal-windows-memory"
+    team: "Windows Memory Team"
+    features:
+      - "GPU buffer allocation"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Windows platform types"

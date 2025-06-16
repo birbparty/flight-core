@@ -1,0 +1,39 @@
+team_info:
+  name: "Flight Memory Components Team"
+  purpose: "Open source WebAssembly Component Model memory abstractions"
+  
+dependencies:
+  external:
+    - project: "WebAssembly Component Model"
+      url: "https://github.com/WebAssembly/component-model"
+      purpose: "Component Model specification and tooling"
+      
+    - project: "wit-bindgen"
+      url: "https://github.com/bytecodealliance/wit-bindgen"
+      purpose: "Generate language bindings from WIT"
+      
+    - project: "wasm-tools"
+      url: "https://github.com/bytecodealliance/wasm-tools"
+      purpose: "WASM component build tools"
+      
+  consumers:
+    - project: "flight"
+      team: "HAL teams"
+      features:
+        - "Memory type definitions"
+        - "Platform memory profiles"
+        - "Validation components"
+        
+    - project: "v6r"
+      team: "v6r-shared-types"
+      features:
+        - "TypeScript memory types"
+        - "Go memory types"
+        - "VM memory tracking"
+        
+    - project: "retro-graph"
+      team: "Core Team"
+      features:
+        - "Zero-allocation patterns"
+        - "Memory pool abstractions"
+        - "Cache alignment helpers"

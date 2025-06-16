@@ -1,0 +1,43 @@
+# Flight Shared Types Dependencies
+# V6R Unblocking Priority: P0
+
+metadata:
+  name: flight-shared-types
+  version: 1.0.0
+  team: shared-types
+  category: foundation
+  priority: critical
+
+external_dependencies:
+  wit_bindgen:
+    type: tool
+    version: ">=0.15.0"
+    critical: true
+    
+  wasm_tools:
+    type: tool  
+    version: ">=1.0.52"
+    critical: true
+    
+  cargo_component:
+    type: tool
+    version: ">=0.5.0"
+    critical: true
+
+internal_dependencies: []
+
+v6r_integration:
+  blocking: true
+  timeline: "Week 1"
+  services:
+    - v6r-api
+    - v6r-mobile
+    - v6r-bridge
+    - v6r-cli
+    
+flight_integration:
+  modules:
+    - flight-memory
+    - flight-hal
+    - flight-component
+    - flight-runtime

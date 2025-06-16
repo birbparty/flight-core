@@ -1,0 +1,58 @@
+// Bounds Validation - Memory boundary checking
+package flight:memory@0.1.0;
+
+interface bounds {
+  use types/core.{memory-address, memory-size, memory-range};
+  use types/regions.{memory-region};
+  
+  // Validate address is within region bounds
+  validate-address-bounds: func(
+    address: memory-address,
+    region: memory-region
+  ) -> result<_, string>;
+  
+  // Validate allocation fits in available space
+  validate-allocation-size: func(
+    size: memory-size,
+    region: memory-region,
+    current-used: memory-size
+  ) -> result<_, string>;
+  
+  // Check if range is within bounds
+  validate-range: func(
+    range: memory-range,
+    region: memory-region
+  ) -> result<_, string>;
+  
+  // Check for range overlap
+  check-overlap: func(
+    range1: memory-range,
+    range2: memory-range
+  ) -> bool;
+  
+  // Calculate if allocation would exceed limit
+  would-exceed-limit: func(
+    current: memory-size,
+    requested: memory-size,
+    limit: memory-size
+  ) -> bool;
+  
+  // Find available range of given size
+  find-free-range: func(
+    region: memory-region,
+    size: memory-size,
+    alignment: u32,
+    allocated-ranges: list<memory-range>
+  ) -> result<memory-range, string>;
+  
+  // Check if address + size would overflow
+  check-address-overflow: func(
+    base: u64,
+    size: u64
+  ) -> result<_, string>;
+  
+  // Validate multiple ranges don't overlap
+  validate-no-overlaps: func(
+    ranges: list<memory-range>
+  ) -> result<_, string>;
+}

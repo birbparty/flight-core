@@ -1,0 +1,16 @@
+# Buck2 rules for Flight Shared Types ORAS publishing
+# Integrates with $HOME/git/oras-buck2 and $HOME/git/finch-buck2
+
+load("//buck2/rules:flight_oras.bzl", "flight_shared_types_publish")
+
+# Memory types publishing
+flight_shared_types_publish(
+    name = "publish_memory_types",
+    wit_files = ["//domains/flight-shared-types/wit:memory.wit"],
+    platforms = ["dreamcast", "v6r-all"],
+    bindings = ["typescript", "go", "cpp17"],
+    annotations = {
+        "flight.types": "memory",
+        "flight.v6r.blocking": "true",
+    },
+)

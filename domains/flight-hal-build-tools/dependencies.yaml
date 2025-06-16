@@ -1,0 +1,10 @@
+team_info:
+  name: "HAL Build Tools Team"
+  purpose: "Provide cross-platform build tooling and toolchains"
+  
+dependencies:
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Platform definitions"
+      - "Build configuration types"

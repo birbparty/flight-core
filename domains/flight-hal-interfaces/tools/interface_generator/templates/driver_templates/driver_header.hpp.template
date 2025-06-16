@@ -1,0 +1,93 @@
+/**
+ * @file {{CLASS_NAME}}.hpp
+ * @brief {{PLATFORM_UPPER}} {{INTERFACE_NAME}} Driver Implementation
+ * 
+ * Platform-specific implementation of the {{INTERFACE_NAME}} interface for {{PLATFORM}}.
+ * Generated on: {{DATE}}
+ */
+
+#pragma once
+
+{{INCLUDE_GUARD}}
+
+#include "../../../include/flight/hal/interfaces/{{INTERFACE_FILENAME}}.hpp"
+#include "../../../include/flight/hal/core/driver_auto_registration.hpp"
+{{PLATFORM_SPECIFIC_INCLUDES}}
+#include <memory>
+#include <mutex>
+
+namespace {{NAMESPACE}} {
+
+/**
+ * @brief {{PLATFORM_UPPER}} implementation of {{INTERFACE_NAME}}
+ * 
+ * This driver provides {{PLATFORM}}-specific implementation of the {{INTERFACE_NAME}}
+ * interface, utilizing platform capabilities and optimizations.
+ */
+class {{CLASS_NAME}} : public {{INTERFACE_NAME}} {
+public:
+    /**
+     * @brief Driver priority for auto-registration
+     */
+    static constexpr int PRIORITY = 10;
+    
+    {{CLASS_NAME}}();
+    ~{{CLASS_NAME}}() override;
+    
+    // === {{INTERFACE_NAME}} Implementation ===
+{{METHODS}}
+    
+    // === IHALInterface Implementation ===
+    std::string_view get_driver_name() const override;
+    int get_priority() const override;
+    HALResult<void> initialize() override;
+    HALResult<void> shutdown() override;
+    bool is_active() const override;
+    bool is_available() const override;
+    std::string_view get_version() const override;
+    
+    // === ICapabilityProvider Implementation ===
+    bool supports_capability(HALCapability capability) const override;
+    uint32_t get_capability_mask() const override;
+    std::vector<HALCapability> get_capabilities() const override;
+    PerformanceTier get_performance_tier() const override;
+    const PlatformInfo& get_platform_info() const override;
+    bool has_fallback(HALCapability capability) const override;
+
+private:
+    /**
+     * @brief Initialize platform-specific capabilities
+     */
+    void init_capabilities();
+    
+    /**
+     * @brief Initialize platform information
+     */
+    void init_platform_info();
+    
+    /**
+     * @brief Check platform compatibility
+     */
+    bool check_platform_compatibility();
+    
+    // Driver state
+    mutable std::mutex state_mutex_;
+    bool initialized_ = false;
+    bool active_ = false;
+    
+    // Platform capabilities
+    uint32_t capability_mask_;
+    std::unique_ptr<PlatformInfo> platform_info_;
+    
+    // Platform-specific data
+    // TODO: Add platform-specific member variables here
+};
+
+} // namespace {{NAMESPACE}}
+
+// Auto-register the driver
+#ifdef {{PLATFORM_DEFINE}}
+REGISTER_HAL_DRIVER(flight::hal::{{INTERFACE_NAME}}, {{NAMESPACE}}::{{CLASS_NAME}});
+#endif
+
+#endif // {{INCLUDE_GUARD}}

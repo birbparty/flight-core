@@ -1,0 +1,13 @@
+team_info:
+  name: "HAL Graphics Interface Team"
+  purpose: "Define graphics context and rendering interfaces"
+  
+dependencies:
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Base types and error handling"
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocation for buffers"

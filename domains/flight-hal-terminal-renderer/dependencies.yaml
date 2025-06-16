@@ -1,0 +1,19 @@
+team_info:
+  name: "Terminal Renderer Team"
+  purpose: "Implement text-based rendering using terminal capabilities"
+  
+dependencies:
+  - project: "flight-hal-graphics-interface"
+    team: "HAL Graphics Interface Team"
+    features:
+      - "Graphics context interface"
+      - "Render surface abstraction"
+  - project: "flight-hal-terminal-memory"
+    team: "Terminal Memory Team"
+    features:
+      - "Frame buffer allocation"
+      - "Text buffer management"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Terminal platform types"

@@ -1,0 +1,375 @@
+package flight:session@1.0.0;
+
+/// Universal session management for Flight-Core multi-platform development
+/// 
+/// Provides vendor-neutral session tracking from Dreamcast (16MB) to modern 
+/// cloud environments with extensible metadata for third-party integrations
+interface session-types {
+    use flight:memory/memory-types.{memory-size, memory-usage-snapshot};
+    use flight:error/error-types.{flight-result, flight-error};
+    use flight:platform/platform-types.{platform-info};
+    
+    /// Session lifecycle states
+    /// 
+    /// Universal state machine for all session types
+    enum session-state {
+        /// Session being created
+        initializing,
+        /// Session active and operational
+        active,
+        /// Session temporarily suspended
+        suspended,
+        /// Session terminating
+        terminating,
+        /// Session terminated
+        terminated,
+        /// Session in error state
+        error,
+    }
+    
+    /// Session types for different use cases
+    /// 
+    /// Extensible session classification system
+    enum session-type {
+        /// Component interaction session
+        component,
+        /// User interaction session
+        user,
+        /// Development environment session
+        development,
+        /// System maintenance session
+        system,
+        /// Testing/validation session
+        testing,
+        /// Custom session type (use metadata for details)
+        custom,
+    }
+    
+    /// Core session information
+    /// 
+    /// Complete session metadata for tracking and management
+    record session-info {
+        /// Unique session identifier
+        id: string,
+        /// Session type
+        session-type: session-type,
+        /// Current state
+        state: session-state,
+        /// Platform where session runs
+        platform: string,
+        /// User identifier (for user sessions)
+        user-id: option<string>,
+        /// Parent session (for nested sessions)
+        parent-session-id: option<string>,
+        /// Session creation time (Unix timestamp)
+        created-at: u64,
+        /// Last activity time (Unix timestamp)
+        last-activity: u64,
+        /// Session expiry time (Unix timestamp)
+        expires-at: option<u64>,
+        /// Extensible session metadata for third-party integrations
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Session resource usage tracking
+    /// 
+    /// Platform-agnostic resource monitoring
+    record session-resources {
+        /// Memory usage snapshot
+        memory: memory-usage-snapshot,
+        /// CPU usage percentage (0.0-100.0)
+        cpu-usage: f32,
+        /// Network bandwidth usage (bytes/sec)
+        network-usage: u64,
+        /// Storage usage
+        storage-usage: memory-size,
+        /// Active connections count
+        connection-count: u32,
+        /// Custom resource metrics (extensible)
+        custom-metrics: list<tuple<string, f32>>,
+    }
+    
+    /// Generic resource limits configuration
+    /// 
+    /// Vendor-neutral resource constraints
+    record resource-limits {
+        /// Maximum memory usage
+        max-memory: option<memory-size>,
+        /// Maximum CPU usage percentage
+        max-cpu-percent: option<f32>,
+        /// Maximum network bandwidth (bytes/sec)
+        max-network-bps: option<u64>,
+        /// Maximum storage usage
+        max-storage: option<memory-size>,
+        /// Maximum connection count
+        max-connections: option<u32>,
+        /// Session timeout (seconds)
+        timeout-seconds: option<u64>,
+        /// Custom resource limits (extensible)
+        custom-limits: list<tuple<string, f32>>,
+    }
+    
+    /// Session configuration
+    /// 
+    /// Extensible configuration system for any environment
+    record session-config {
+        /// Resource limits for this session
+        resource-limits: option<resource-limits>,
+        /// Environment variables
+        environment: list<tuple<string, string>>,
+        /// Working directory
+        working-directory: option<string>,
+        /// Session-specific configuration (extensible)
+        custom-config: list<tuple<string, string>>,
+    }
+    
+    /// Session health status
+    /// 
+    /// Health monitoring for session management
+    enum session-health {
+        /// Session operating normally
+        healthy,
+        /// Session showing signs of stress
+        warning,
+        /// Session experiencing issues
+        degraded,
+        /// Session in critical condition
+        critical,
+        /// Session health unknown
+        unknown,
+    }
+    
+    /// Session event types for monitoring
+    /// 
+    /// Event system for session lifecycle tracking
+    enum session-event-type {
+        /// Session created
+        created,
+        /// Session started
+        started,
+        /// Session suspended
+        suspended,
+        /// Session resumed
+        resumed,
+        /// Session terminated
+        terminated,
+        /// Session error occurred
+        error-occurred,
+        /// Resource limit exceeded
+        resource-limit-exceeded,
+        /// Health status changed
+        health-changed,
+        /// Custom event (use metadata)
+        custom,
+    }
+    
+    /// Session event record
+    /// 
+    /// Event tracking for session monitoring
+    record session-event {
+        /// Event identifier
+        id: string,
+        /// Session this event relates to
+        session-id: string,
+        /// Type of event
+        event-type: session-event-type,
+        /// When event occurred (Unix timestamp)
+        timestamp: u64,
+        /// Event message
+        message: string,
+        /// Additional event data
+        data: list<tuple<string, string>>,
+    }
+}
+
+/// Session management operations interface
+/// 
+/// Core session lifecycle and monitoring operations
+interface session-operations {
+    use session-types.{session-info, session-state, session-type, session-config,
+                      session-resources, resource-limits, session-health,
+                      session-event, session-event-type, flight-result};
+    
+    /// Create new session
+    /// 
+    /// Creates a new session with optional configuration
+    create-session: func(
+        session-type: session-type,
+        platform: string,
+        user-id: option<string>,
+        config: option<session-config>
+    ) -> flight-result<session-info>;
+    
+    /// Get session information
+    /// 
+    /// Retrieves complete session information
+    get-session: func(session-id: string) -> flight-result<session-info>;
+    
+    /// Update session state
+    /// 
+    /// Changes session state with validation
+    update-session-state: func(
+        session-id: string,
+        new-state: session-state
+    ) -> flight-result<bool>;
+    
+    /// Terminate session
+    /// 
+    /// Gracefully terminates session and cleans up resources
+    terminate-session: func(session-id: string) -> flight-result<bool>;
+    
+    /// Get session resources
+    /// 
+    /// Retrieves current resource usage for session
+    get-session-resources: func(
+        session-id: string
+    ) -> flight-result<session-resources>;
+    
+    /// List sessions
+    /// 
+    /// Lists sessions with optional filtering
+    list-sessions: func(
+        user-id: option<string>,
+        session-type: option<session-type>,
+        platform: option<string>
+    ) -> flight-result<list<session-info>>;
+    
+    /// Extend session expiry
+    /// 
+    /// Extends session timeout to prevent automatic termination
+    extend-session: func(
+        session-id: string,
+        additional-seconds: u64
+    ) -> flight-result<bool>;
+    
+    /// Update session metadata
+    /// 
+    /// Updates session metadata for extensibility
+    update-session-metadata: func(
+        session-id: string,
+        metadata: list<tuple<string, string>>
+    ) -> flight-result<bool>;
+    
+    /// Set resource limits
+    /// 
+    /// Updates resource limits for active session
+    set-resource-limits: func(
+        session-id: string,
+        limits: resource-limits
+    ) -> flight-result<bool>;
+    
+    /// Get session health
+    /// 
+    /// Retrieves current session health status
+    get-session-health: func(session-id: string) -> flight-result<session-health>;
+    
+    /// Record session event
+    /// 
+    /// Records custom event for session monitoring
+    record-session-event: func(
+        session-id: string,
+        event-type: session-event-type,
+        message: string,
+        data: list<tuple<string, string>>
+    ) -> flight-result<bool>;
+    
+    /// Get session events
+    /// 
+    /// Retrieves session event history
+    get-session-events: func(
+        session-id: string,
+        limit: option<u32>
+    ) -> flight-result<list<session-event>>;
+}
+
+/// Session analytics and monitoring interface
+/// 
+/// Advanced session monitoring and analytics capabilities
+interface session-analytics {
+    use session-types.{session-info, session-resources, session-health, 
+                      session-event, flight-result};
+    
+    /// Session statistics summary
+    /// 
+    /// Comprehensive session usage statistics
+    record session-stats {
+        /// Total active sessions
+        active-sessions: u32,
+        /// Total sessions created today
+        sessions-created-today: u32,
+        /// Total sessions terminated today
+        sessions-terminated-today: u32,
+        /// Average session duration (seconds)
+        average-duration: f32,
+        /// Sessions by type breakdown
+        sessions-by-type: list<tuple<session-type, u32>>,
+        /// Sessions by platform breakdown
+        sessions-by-platform: list<tuple<string, u32>>,
+        /// Overall system health
+        system-health: session-health,
+    }
+    
+    /// Resource usage aggregation
+    /// 
+    /// Aggregated resource usage across sessions
+    record resource-usage-aggregate {
+        /// Total memory usage across all sessions
+        total-memory-usage: memory-size,
+        /// Average CPU usage across sessions
+        average-cpu-usage: f32,
+        /// Total network bandwidth usage
+        total-network-usage: u64,
+        /// Total storage usage
+        total-storage-usage: memory-size,
+        /// Total active connections
+        total-connections: u32,
+        /// Resource usage by platform
+        usage-by-platform: list<tuple<string, session-resources>>,
+    }
+    
+    /// Get session statistics
+    /// 
+    /// Retrieves comprehensive session statistics
+    get-session-stats: func() -> flight-result<session-stats>;
+    
+    /// Get resource usage aggregate
+    /// 
+    /// Retrieves aggregated resource usage across all sessions
+    get-resource-usage-aggregate: func() -> flight-result<resource-usage-aggregate>;
+    
+    /// Find sessions by criteria
+    /// 
+    /// Advanced session filtering and search
+    find-sessions: func(
+        criteria: list<tuple<string, string>>
+    ) -> flight-result<list<session-info>>;
+    
+    /// Get sessions by health status
+    /// 
+    /// Retrieves sessions matching health criteria
+    get-sessions-by-health: func(
+        health: session-health
+    ) -> flight-result<list<session-info>>;
+    
+    /// Calculate session efficiency
+    /// 
+    /// Analyzes session resource efficiency
+    calculate-session-efficiency: func(
+        session-id: string
+    ) -> flight-result<f32>;
+    
+    /// Generate session report
+    /// 
+    /// Generates comprehensive session usage report
+    generate-session-report: func(
+        time-window-hours: u32,
+        include-events: bool
+    ) -> flight-result<string>;
+}
+
+/// Flight Session World - Component Model entry point
+world flight-session {
+    export session-types;
+    export session-operations;
+    export session-analytics;
+}

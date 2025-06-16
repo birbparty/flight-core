@@ -1,0 +1,19 @@
+team_info:
+  name: "PSP GU Team"
+  purpose: "Implement PSP Graphics Unit interface"
+  
+dependencies:
+  - project: "flight-hal-graphics-interface"
+    team: "HAL Graphics Interface Team"
+    features:
+      - "Graphics context interface"
+      - "Command buffer abstraction"
+  - project: "flight-hal-psp-memory"
+    team: "PSP Memory Team"
+    features:
+      - "VRAM allocation"
+      - "Display list memory"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "PSP platform types"

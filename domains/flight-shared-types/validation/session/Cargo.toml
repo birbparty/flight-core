@@ -1,0 +1,21 @@
+[package]
+name = "flight-session-validation"
+version = "1.0.0"
+edition = "2021"
+description = "Session types validation for Flight-Core"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wit-bindgen = "0.25.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+
+[dependencies.wit-bindgen-rt]
+version = "0.25.0"
+features = ["bitflags"]
+
+[build-dependencies]
+wit-bindgen = "0.25.0"

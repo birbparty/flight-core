@@ -1,0 +1,48 @@
+{
+  "name": "@flight/platform-types",
+  "version": "1.0.0",
+  "description": "Flight-Core platform abstraction types for TypeScript - Universal cross-platform development",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "flight",
+    "platform",
+    "cross-platform",
+    "wasm",
+    "component-model",
+    "v6r",
+    "retro-gaming",
+    "dreamcast",
+    "psp",
+    "vita"
+  ],
+  "author": "Flight-Core Team",
+  "license": "MIT",
+  "dependencies": {
+    "@flight/memory-types": "^1.0.0",
+    "@flight/error-types": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.5.0",
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://oras.birb.homes"
+  }
+}

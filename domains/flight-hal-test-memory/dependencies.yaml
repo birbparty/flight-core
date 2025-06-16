@@ -1,0 +1,14 @@
+team_info:
+  name: "HAL Memory Test Team"
+  purpose: "Test memory subsystem implementations"
+  
+dependencies:
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory interfaces"
+  - project: "flight-hal-test-minimal"
+    team: "HAL Minimal Test Team"
+    features:
+      - "Test framework"
+      - "Platform detection"

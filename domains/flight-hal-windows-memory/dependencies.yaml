@@ -1,0 +1,15 @@
+team_info:
+  name: "Windows Memory Team"
+  purpose: "Implement Windows memory management with VirtualAlloc"
+  
+dependencies:
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocator interface"
+      - "Virtual memory support"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Windows platform detection"
+      - "Error types"

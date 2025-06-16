@@ -1,0 +1,49 @@
+// Platform Memory Constants - Hardcoded platform specifications
+package flight:memory@0.1.0;
+
+interface platform-constants {
+  // PlayStation 1 (PSX) Memory Layout
+  const PSX-MAIN-RAM: u64 = 2097152;        // 2MB
+  const PSX-VRAM: u64 = 1048576;            // 1MB  
+  const PSX-SPU-RAM: u64 = 524288;          // 512KB
+  const PSX-SCRATCHPAD: u64 = 1024;         // 1KB
+  const PSX-PAGE-SIZE: u32 = 4096;          // 4KB
+  
+  // Sega Dreamcast Memory Layout
+  const DC-MAIN-RAM: u64 = 16777216;        // 16MB
+  const DC-VRAM: u64 = 8388608;             // 8MB
+  const DC-AUDIO-RAM: u64 = 2097152;        // 2MB
+  const DC-TEXTURE-RAM: u64 = 8388608;      // 8MB (part of VRAM)
+  const DC-PAGE-SIZE: u32 = 4096;           // 4KB
+  
+  // PlayStation Portable (PSP) Memory Layout
+  const PSP-MAIN-RAM-PHAT: u64 = 33554432;  // 32MB (PSP-1000)
+  const PSP-MAIN-RAM-SLIM: u64 = 67108864;  // 64MB (PSP-2000+)
+  const PSP-VRAM: u64 = 2097152;            // 2MB
+  const PSP-ME-RAM: u64 = 2097152;          // 2MB Media Engine
+  const PSP-PAGE-SIZE: u32 = 4096;          // 4KB
+  
+  // Modern Platform Typical Sizes
+  const MODERN-MIN-RAM: u64 = 4294967296;   // 4GB minimum
+  const MODERN-TYPICAL-RAM: u64 = 17179869184; // 16GB typical
+  const MODERN-MAX-ALLOC: u64 = 2147483648; // 2GB max single alloc
+  const MODERN-PAGE-SIZE: u32 = 4096;       // 4KB typical
+  const MODERN-HUGE-PAGE: u32 = 2097152;    // 2MB huge pages
+  
+  // Mobile Platform Typical Sizes
+  const MOBILE-MIN-RAM: u64 = 2147483648;   // 2GB minimum
+  const MOBILE-TYPICAL-RAM: u64 = 8589934592; // 8GB typical
+  const MOBILE-MAX-ALLOC: u64 = 1073741824; // 1GB max single alloc
+  const MOBILE-PAGE-SIZE: u32 = 4096;       // 4KB
+  
+  // Web Platform Constraints
+  const WEB-WASM-MAX-MEMORY: u64 = 4294967296; // 4GB WASM limit
+  const WEB-TYPICAL-HEAP: u64 = 268435456;     // 256MB typical
+  const WEB-MAX-ALLOC: u64 = 1073741824;       // 1GB practical limit
+  const WEB-PAGE-SIZE: u32 = 65536;            // 64KB WASM pages
+  
+  // VM Size Presets (for v6r)
+  const VM-SMALL-MEMORY: u64 = 4294967296;  // 4GB
+  const VM-MEDIUM-MEMORY: u64 = 8589934592; // 8GB  
+  const VM-LARGE-MEMORY: u64 = 17179869184; // 16GB
+}

@@ -1,0 +1,169 @@
+/**
+ * @file {{CLASS_NAME}}.cpp
+ * @brief Implementation of {{PLATFORM_UPPER}} {{INTERFACE_NAME}} Driver
+ * 
+ * Generated on: {{DATE}}
+ */
+
+#include "{{CLASS_NAME}}.hpp"
+#include "../../../include/flight/hal/core/hal_logging.hpp"
+#include <iostream>
+
+namespace {{NAMESPACE}} {
+
+{{CLASS_NAME}}::{{CLASS_NAME}}() {
+    init_platform_info();
+    init_capabilities();
+}
+
+{{CLASS_NAME}}::~{{CLASS_NAME}}() {
+    if (initialized_) {
+        shutdown();
+    }
+}
+
+// === IHALInterface Implementation ===
+
+std::string_view {{CLASS_NAME}}::get_driver_name() const {
+    return "{{CLASS_NAME}}";
+}
+
+int {{CLASS_NAME}}::get_priority() const {
+    return PRIORITY;
+}
+
+HALResult<void> {{CLASS_NAME}}::initialize() {
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    
+    if (initialized_) {
+        return HALError::AlreadyInitialized;
+    }
+    
+    if (!check_platform_compatibility()) {
+        return HALError::PlatformNotSupported;
+    }
+    
+    // TODO: Add platform-specific initialization code here
+    
+    initialized_ = true;
+    active_ = true;
+    
+    HAL_LOG_INFO("{{CLASS_NAME}} initialized successfully");
+    return HALResult<void>::success();
+}
+
+HALResult<void> {{CLASS_NAME}}::shutdown() {
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    
+    if (!initialized_) {
+        return HALError::NotInitialized;
+    }
+    
+    // TODO: Add platform-specific cleanup code here
+    
+    active_ = false;
+    initialized_ = false;
+    
+    HAL_LOG_INFO("{{CLASS_NAME}} shutdown successfully");
+    return HALResult<void>::success();
+}
+
+bool {{CLASS_NAME}}::is_active() const {
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    return active_;
+}
+
+bool {{CLASS_NAME}}::is_available() const {
+    return check_platform_compatibility();
+}
+
+std::string_view {{CLASS_NAME}}::get_version() const {
+    return "1.0.0";
+}
+
+// === ICapabilityProvider Implementation ===
+
+bool {{CLASS_NAME}}::supports_capability(HALCapability capability) const {
+    return (capability_mask_ & static_cast<uint32_t>(capability)) != 0;
+}
+
+uint32_t {{CLASS_NAME}}::get_capability_mask() const {
+    return capability_mask_;
+}
+
+std::vector<HALCapability> {{CLASS_NAME}}::get_capabilities() const {
+    std::vector<HALCapability> capabilities;
+    
+    for (uint32_t i = 0; i < 32; ++i) {
+        uint32_t capability_bit = 1u << i;
+        if (capability_mask_ & capability_bit) {
+            capabilities.push_back(static_cast<HALCapability>(capability_bit));
+        }
+    }
+    
+    return capabilities;
+}
+
+PerformanceTier {{CLASS_NAME}}::get_performance_tier() const {
+    // TODO: Determine appropriate performance tier for {{PLATFORM}}
+    return PerformanceTier::Standard;
+}
+
+const PlatformInfo& {{CLASS_NAME}}::get_platform_info() const {
+    return *platform_info_;
+}
+
+bool {{CLASS_NAME}}::has_fallback(HALCapability capability) const {
+    // TODO: Implement fallback capability detection
+    return false;
+}
+
+// === {{INTERFACE_NAME}} Implementation ===
+// TODO: Implement all interface methods here
+// Example implementation patterns:
+//
+// HALResult<SomeType> {{CLASS_NAME}}::some_method(param_type param) {
+//     std::lock_guard<std::mutex> lock(state_mutex_);
+//     
+//     if (!initialized_) {
+//         return HALError::NotInitialized;
+//     }
+//     
+//     // TODO: Add platform-specific implementation
+//     
+//     return HALResult<SomeType>::success(result);
+// }
+
+// === Private Methods ===
+
+void {{CLASS_NAME}}::init_capabilities() {
+    capability_mask_ = 0;
+    
+    // TODO: Set platform-specific capabilities
+    // Example:
+    // capability_mask_ |= static_cast<uint32_t>(HALCapability::Memory);
+    // capability_mask_ |= static_cast<uint32_t>(HALCapability::Graphics);
+}
+
+void {{CLASS_NAME}}::init_platform_info() {
+    platform_info_ = std::make_unique<PlatformInfo>();
+    
+    // TODO: Initialize platform-specific information
+    platform_info_->platform_name = "{{PLATFORM}}";
+    platform_info_->architecture = "unknown";
+    platform_info_->cpu_count = 1;
+    platform_info_->total_memory = 0;
+    platform_info_->page_size = 4096;
+    platform_info_->endianness = Endianness::Little;
+}
+
+bool {{CLASS_NAME}}::check_platform_compatibility() {
+    // TODO: Add platform-specific compatibility checks
+    #ifdef {{PLATFORM_DEFINE}}
+        return true;
+    #else
+        return false;
+    #endif
+}
+
+} // namespace {{NAMESPACE}}

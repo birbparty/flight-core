@@ -1,0 +1,24 @@
+[package]
+name = "flight-authentication-validation"
+version = "1.0.0"
+edition = "2021"
+description = "Flight-Core authentication validation and testing"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4"] }
+jsonwebtoken = "9.0"
+base64 = "0.21"
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["full"] }
+
+[lib]
+name = "flight_authentication_validation"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "auth_bench"
+path = "src/bench.rs"

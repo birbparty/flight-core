@@ -1,0 +1,13 @@
+team_info:
+  name: "HAL Audio Interface Team"
+  purpose: "Define audio device and buffer interfaces"
+  
+dependencies:
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Base types and error handling"
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocation for audio buffers"

@@ -1,0 +1,19 @@
+{
+  "name": "flight-hal-web-webaudio",
+  "projectType": "library",
+  "sourceRoot": "teams/flight-hal-web-webaudio//src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/cmake:build",
+      "options": {
+        "buildDirectory": "build"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/cmake:test",
+      "options": {
+        "testDirectory": "build/tests"
+      }
+    }
+  }
+}

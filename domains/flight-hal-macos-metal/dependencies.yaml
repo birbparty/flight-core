@@ -1,0 +1,20 @@
+team_info:
+  name: "macOS Metal Team"
+  purpose: "Implement Metal graphics backend for macOS"
+  
+dependencies:
+  - project: "flight-hal-graphics-interface"
+    team: "HAL Graphics Interface Team"
+    features:
+      - "Graphics context interface"
+      - "Command buffer abstraction"
+      - "Shader interface"
+  - project: "flight-hal-macos-memory"
+    team: "macOS Memory Team"
+    features:
+      - "GPU buffer allocation"
+      - "Shared memory support"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "macOS platform types"

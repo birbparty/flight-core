@@ -1,0 +1,15 @@
+team_info:
+  name: "Terminal Input Team"
+  purpose: "Handle keyboard, mouse, and terminal events"
+  
+dependencies:
+  - project: "flight-hal-input-interface"
+    team: "HAL Input Interface Team"
+    features:
+      - "Input device interface"
+      - "Event handling"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Terminal platform types"
+      - "Event types"

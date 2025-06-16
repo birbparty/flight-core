@@ -1,0 +1,61 @@
+// Memory Region Types - Platform-specific memory areas
+package flight:memory@0.1.0;
+
+interface regions {
+  use core.{memory-size, memory-address, access-flags};
+  
+  // Types of memory regions across platforms
+  enum region-type {
+    main,        // Main system RAM
+    video,       // Video RAM (VRAM)
+    audio,       // Audio/SPU RAM
+    scratchpad,  // Fast local memory (PSX, PSP)
+    io,          // Memory-mapped I/O
+    rom,         // Read-only memory
+    custom,      // Platform-specific regions
+  }
+  
+  // Attributes that affect how memory can be used
+  record region-attributes {
+    cacheable: bool,      // Can be cached by CPU
+    dma-accessible: bool, // Accessible by DMA engines
+    volatile: bool,       // Memory contents may change
+    shared: bool,         // Shared between processors
+  }
+  
+  // Complete memory region definition
+  record memory-region {
+    region-type: region-type,
+    name: string,                    // Human-readable name
+    base-address: memory-address,    // Start address
+    size: memory-size,               // Total size
+    access: access-flags,            // R/W/X permissions
+    attributes: region-attributes,   // Special attributes
+    available: memory-size,          // Currently available
+  }
+  
+  // Usage tracking for a region
+  record region-usage {
+    region: region-type,
+    used: memory-size,
+    available: memory-size,
+    fragmentation: float32,    // 0.0 to 1.0
+    largest-free-block: memory-size,
+    allocation-count: u32,
+  }
+  
+  // Helper functions for region management
+  
+  // Check if an address falls within a region
+  contains-address: func(region: memory-region, addr: memory-address) -> bool;
+  
+  // Check if a range fits in available space
+  can-allocate: func(region: memory-region, size: memory-size) -> bool;
+  
+  // Calculate fragmentation percentage
+  calculate-fragmentation: func(usage: region-usage) -> float32;
+  
+  // Get region by type for a platform
+  get-region-for-platform: func(platform: string, region-type: region-type) 
+    -> result<memory-region, string>;
+}

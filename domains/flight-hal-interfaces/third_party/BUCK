@@ -1,0 +1,29 @@
+# Third-party dependencies for Buck2 build
+
+# External dependencies will be defined here when migration is complete
+# Currently using CMake FetchContent - Buck2 equivalents will be:
+
+# Example dependency structure:
+# http_archive(
+#     name = "fmt",
+#     urls = ["https://github.com/fmtlib/fmt/archive/10.2.1.tar.gz"],
+#     sha256 = "78b8c0a72b1c35e4443a7e308df52498252d1cefc2b08c9a97bc9ee6cfe61f8b",
+#     strip_prefix = "fmt-10.2.1",
+#     build_file = "//third_party:fmt.BUILD",
+# )
+
+# http_archive(
+#     name = "spdlog", 
+#     urls = ["https://github.com/gabime/spdlog/archive/v1.12.0.tar.gz"],
+#     sha256 = "4dccf2d10f410c1e2feaff89966bfc49a1abb29ef6f08246335b110e001e09a9",
+#     strip_prefix = "spdlog-1.12.0",
+#     build_file = "//third_party:spdlog.BUILD",
+# )
+
+# http_archive(
+#     name = "googletest",
+#     urls = ["https://github.com/google/googletest/archive/v1.14.0.tar.gz"],
+#     sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bbc5d7",
+#     strip_prefix = "googletest-1.14.0",
+#     build_file = "//third_party:googletest.BUILD",
+# )

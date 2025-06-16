@@ -1,0 +1,165 @@
+# CMakeLists.txt for {{CLASS_NAME}} - {{PLATFORM_UPPER}} {{INTERFACE_NAME}} Driver
+# Generated on: {{DATE}}
+
+cmake_minimum_required(VERSION 3.16)
+project({{CLASS_NAME}} VERSION 1.0.0)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Platform-specific configuration
+if({{PLATFORM_DEFINE}})
+    message(STATUS "Building {{CLASS_NAME}} for {{PLATFORM_UPPER}} platform")
+else()
+    message(WARNING "{{CLASS_NAME}} is designed for {{PLATFORM_UPPER}} platform but may not be available")
+endif()
+
+# Find required packages
+find_package(Threads REQUIRED)
+
+# Platform-specific dependencies
+if({{PLATFORM_DEFINE}})
+    # TODO: Add platform-specific dependencies here
+    # Example for Windows:
+    # if(WIN32)
+    #     find_package(DirectX REQUIRED)
+    # endif()
+endif()
+
+# Include directories
+target_include_directories({{CLASS_NAME}}
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Source files
+set(SOURCES
+    src/{{CLASS_NAME}}.cpp
+    # TODO: Add additional source files as needed
+)
+
+set(HEADERS
+    include/{{CLASS_NAME}}.hpp
+    # TODO: Add additional header files as needed
+)
+
+# Create the driver library
+add_library({{CLASS_NAME}} ${SOURCES} ${HEADERS})
+
+# Link libraries
+target_link_libraries({{CLASS_NAME}}
+    PUBLIC
+        flight_hal_core
+        flight_hal_interfaces
+    PRIVATE
+        Threads::Threads
+        # TODO: Add platform-specific libraries here
+)
+
+# Compiler-specific options
+target_compile_options({{CLASS_NAME}} PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/W4>
+    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic>
+    $<$<CXX_COMPILER_ID:Clang>:-Wall -Wextra -Wpedantic>
+)
+
+# Platform-specific compile definitions
+target_compile_definitions({{CLASS_NAME}} PRIVATE
+    {{PLATFORM_DEFINE}}=1
+    $<$<CONFIG:Debug>:DEBUG=1>
+    $<$<CONFIG:Release>:NDEBUG=1>
+)
+
+# Platform-specific link options
+if({{PLATFORM_DEFINE}})
+    # TODO: Add platform-specific link options
+    # Example:
+    # if(WIN32)
+    #     target_link_libraries({{CLASS_NAME}} PRIVATE d3d11 dsound)
+    # elseif(UNIX AND NOT APPLE)
+    #     target_link_libraries({{CLASS_NAME}} PRIVATE X11 GL asound)
+    # endif()
+endif()
+
+# Installation
+include(GNUInstallDirs)
+
+install(TARGETS {{CLASS_NAME}}
+    EXPORT {{CLASS_NAME}}Targets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(FILES ${HEADERS}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/flight/hal/drivers/{{PLATFORM}}
+)
+
+# Export configuration
+install(EXPORT {{CLASS_NAME}}Targets
+    FILE {{CLASS_NAME}}Targets.cmake
+    NAMESPACE flight::hal::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/{{CLASS_NAME}}
+)
+
+# Create config file
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/{{CLASS_NAME}}Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/{{CLASS_NAME}}Config.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/{{CLASS_NAME}}
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/{{CLASS_NAME}}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/{{CLASS_NAME}}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/{{CLASS_NAME}}ConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/{{CLASS_NAME}}
+)
+
+# Testing
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+
+# Examples
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+
+# Documentation
+if(BUILD_DOCUMENTATION)
+    find_package(Doxygen)
+    if(DOXYGEN_FOUND)
+        set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+        set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+        
+        configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+        
+        add_custom_target({{CLASS_NAME}}_docs
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen"
+            VERBATIM
+        )
+    endif()
+endif()
+
+# Package configuration
+set(CPACK_PACKAGE_NAME "{{CLASS_NAME}}")
+set(CPACK_PACKAGE_VENDOR "Flight HAL")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "{{PLATFORM_UPPER}} {{INTERFACE_NAME}} Driver for Flight HAL")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "{{CLASS_NAME}}")
+
+include(CPack)

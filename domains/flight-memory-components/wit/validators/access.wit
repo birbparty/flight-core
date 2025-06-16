@@ -1,0 +1,56 @@
+// Access Validation - Memory access permission checking
+package flight:memory@0.1.0;
+
+interface access {
+  use types/core.{access-flags, memory-address};
+  use types/regions.{memory-region, region-type};
+  
+  // Validate read access to address
+  validate-read-access: func(
+    address: memory-address,
+    region: memory-region
+  ) -> result<_, string>;
+  
+  // Validate write access to address
+  validate-write-access: func(
+    address: memory-address,
+    region: memory-region
+  ) -> result<_, string>;
+  
+  // Validate execute access to address
+  validate-execute-access: func(
+    address: memory-address,
+    region: memory-region
+  ) -> result<_, string>;
+  
+  // Check if region allows specific access
+  has-access: func(
+    region: memory-region,
+    requested: access-flags
+  ) -> bool;
+  
+  // Validate access flags combination
+  validate-access-flags: func(
+    flags: access-flags,
+    region-type: region-type
+  ) -> result<_, string>;
+  
+  // Get allowed access for region type
+  get-allowed-access: func(
+    region-type: region-type
+  ) -> access-flags;
+  
+  // Check if access would violate security
+  is-secure-access: func(
+    address: memory-address,
+    flags: access-flags,
+    region: memory-region
+  ) -> result<_, string>;
+  
+  // Platform-specific access validation
+  validate-platform-access: func(
+    platform: string,
+    address: memory-address,
+    flags: access-flags
+  ) -> result<_, string>;
+}

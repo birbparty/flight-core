@@ -1,0 +1,30 @@
+{
+  "name": "flight-shared-types",
+  "version": "1.0.0",
+  "description": "Universal Component Model types for Flight-Core and V6R integration",
+  "type": "shared-library",
+  "language": "wit+cpp17",
+  "platforms": [
+    "dreamcast",
+    "psp", 
+    "windows",
+    "macos",
+    "linux",
+    "android",
+    "web",
+    "v6r-vm"
+  ],
+  "dependencies": [],
+  "exports": {
+    "wit": "wit/*.wit",
+    "bindings": "bindings/",
+    "validation": "validation/"
+  },
+  "build": {
+    "wit": true,
+    "cpp17": true,
+    "cross_language": true
+  },
+  "team": "shared-types",
+  "priority": "critical"
+}

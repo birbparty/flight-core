@@ -1,0 +1,24 @@
+team_info:
+  name: "Terminal Platform Integration Team"
+  purpose: "Integrate all terminal subsystems into cohesive platform"
+  
+dependencies:
+  - project: "flight-hal-terminal-memory"
+    team: "Terminal Memory Team"
+    features:
+      - "Complete memory management"
+  - project: "flight-hal-terminal-renderer"
+    team: "Terminal Renderer Team"
+    features:
+      - "Terminal rendering system"
+      - "ANSI/ncurses support"
+  - project: "flight-hal-terminal-input"
+    team: "Terminal Input Team"
+    features:
+      - "Keyboard/mouse input"
+      - "Terminal event handling"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Platform interface"
+      - "Driver registry"

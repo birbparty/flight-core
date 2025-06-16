@@ -1,0 +1,31 @@
+# Flight Shared Types ORAS Configuration
+# Based on /Users/punk1290/git/flight/proompts/shared-types/docs/flight-oras-integration-guide.md
+
+registry: "oras.birb.homes"
+namespace: "flight/shared-types"
+
+artifacts:
+  memory-types:
+    category: "shared-types"
+    platforms: ["dreamcast", "psp", "windows", "macos", "linux", "v6r-small", "v6r-medium", "v6r-large"]
+    bindings: ["typescript", "go", "rust", "cpp17"]
+    
+  error-types:
+    category: "shared-types"
+    platforms: ["all"]
+    bindings: ["typescript", "go", "rust", "cpp17"]
+    
+  platform-types:
+    category: "shared-types" 
+    platforms: ["all"]
+    bindings: ["typescript", "go", "rust", "cpp17"]
+
+publishing:
+  auto_version: true
+  platform_matrix: true
+  metadata:
+    flight.project: "flight"
+    flight.category: "shared-types"
+    flight.team: "shared-types"
+    flight.cpp.standard: "17"
+    org.opencontainers.image.source: "https://github.com/flight/flight"

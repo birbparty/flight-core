@@ -1,0 +1,17 @@
+team_info:
+  name: "Web WebGL Team"
+  purpose: "Implement WebGL2 graphics backend"
+  
+dependencies:
+  - project: "flight-hal-graphics-interface"
+    team: "HAL Graphics Interface Team"
+    features:
+      - "Graphics context interface"
+  - project: "flight-hal-web-memory"
+    team: "Web Memory Team"
+    features:
+      - "Buffer allocation"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Emscripten platform types"

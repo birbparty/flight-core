@@ -1,0 +1,15 @@
+team_info:
+  name: "Dreamcast Memory Team"
+  purpose: "Implement Dreamcast memory management (16MB RAM, 8MB VRAM)"
+  
+dependencies:
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocator interface"
+      - "Memory region definitions"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Dreamcast platform detection"
+      - "Error types"

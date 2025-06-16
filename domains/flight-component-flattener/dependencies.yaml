@@ -1,0 +1,114 @@
+team_info:
+  name: "Flight Component Flattener Team"
+  purpose: "Build tool to flatten multiple Component Model components into single core WASM binary"
+  critical_path: true
+  
+dependencies:
+  - project: "flight-memory-layout"
+    team: "Flight Memory Layout Team"
+    features_needed:
+      - "Memory segment allocation algorithms"
+      - "Guard page implementation"
+      - "Memory rebasing utilities"
+      - "Shared memory region protocols"
+    blocker: true
+    why: "Cannot merge component memories without safe layout algorithms"
+    
+  - project: "flight-memory-components"
+    team: "Flight Memory Components Team"
+    features_needed:
+      - "Memory type definitions"
+      - "Platform memory constraints"
+      - "Alignment requirements"
+    blocker: false
+    why: "Need standardized memory types for cross-component compatibility"
+    
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features_needed:
+      - "Platform detection macros"
+      - "Target platform constraints"
+    blocker: false
+    why: "Need to understand target platform limitations for optimization"
+
+what_we_provide:
+  - feature: "Component flattening tool"
+    consumers:
+      - "Flight Simple Runtime Team"
+      - "Flight Build Pipeline Team"
+      - "All game developers"
+    format: "Command-line tool and C++ library"
+    
+  - feature: "Flattened WASM modules"
+    consumers:
+      - "Flight Simple Runtime Team"
+    format: "Optimized .wasm files"
+    
+  - feature: "Build manifests"
+    consumers:
+      - "Flight Build Pipeline Team"
+    format: "JSON/YAML metadata about flattening process"
+    
+  - feature: "Debug symbols"
+    consumers:
+      - "Flight Debug Instrumentation Team"
+    format: "Source maps and debug metadata"
+
+blocks:
+  - team: "Flight Simple Runtime Team"
+    why: "They need flattened modules to execute"
+    impact: "Cannot test runtime without our output"
+    
+  - team: "Flight Build Pipeline Team"
+    why: "They need to integrate our tool into build process"
+    impact: "Cannot create end-to-end builds"
+    
+  - team: "All Platform Teams"
+    why: "They need flattened modules for testing"
+    impact: "Cannot validate platform implementations"
+
+deliverables:
+  phase_1:
+    - "Basic component parser"
+    - "Dependency graph builder"
+    - "Simple merge without optimization"
+    
+  phase_2:
+    - "Memory layout merging"
+    - "Export conflict resolution"
+    - "Cross-component optimization"
+    
+  phase_3:
+    - "Debug information preservation"
+    - "Incremental build support"
+    - "Platform-specific optimizations"
+
+external_dependencies:
+  - name: "Binaryen"
+    version: "latest"
+    purpose: "WebAssembly manipulation and optimization"
+    license: "Apache-2.0"
+    
+  - name: "wasm-tools"
+    version: "latest"
+    purpose: "Component model extraction and validation"
+    license: "Apache-2.0"
+    
+  - name: "YAML-CPP"
+    version: "0.7+"
+    purpose: "Configuration file parsing"
+    license: "MIT"
+
+technical_requirements:
+  language: "C++17"
+  build_system: "CMake 3.14+"
+  platforms:
+    - "Linux (Ubuntu 20.04+)"
+    - "macOS (10.14+)"
+    - "Windows (10+)"
+  
+constraints:
+  - "Must handle components up to 100MB each"
+  - "Must flatten 20 components in < 5 seconds"
+  - "Output must run on 2MB PSX"
+  - "Tool binary must be < 50MB"

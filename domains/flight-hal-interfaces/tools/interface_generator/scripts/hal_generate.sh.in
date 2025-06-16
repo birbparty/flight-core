@@ -1,0 +1,18 @@
+#!/bin/bash
+# Flight HAL Code Generator Convenience Script
+# This script provides easy access to the HAL code generator
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+GENERATOR="@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/hal_generator"
+TEMPLATES_DIR="@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_DATADIR@/flight_hal/templates"
+INTERFACES_DIR="@CMAKE_INSTALL_PREFIX@/include/flight/hal/interfaces"
+
+# Check if generator exists
+if [ ! -f "$GENERATOR" ]; then
+    echo "Error: HAL generator not found at $GENERATOR"
+    echo "Please ensure Flight HAL is properly installed."
+    exit 1
+fi
+
+# Pass all arguments to the generator with template and interface directories
+exec "$GENERATOR" --templates "$TEMPLATES_DIR" --interfaces "$INTERFACES_DIR" "$@"

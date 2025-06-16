@@ -1,0 +1,20 @@
+[package]
+name = "flight-shared-types-complete"
+version = "1.0.0"
+edition = "2021"
+
+[workspace]
+# This package is standalone and not part of the parent workspace
+description = "Complete Rust bindings for Flight Shared Types with Component Model integration"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.0", features = ["v4", "js"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1.0"
+
+[features]
+default = ["component-model"]
+component-model = []
+flight = []

@@ -1,0 +1,48 @@
+// Alignment Validation - Memory alignment checking and helpers
+package flight:memory@0.1.0;
+
+interface alignment {
+  use types/core.{memory-address, memory-alignment, memory-size};
+  
+  // Validate that an address meets alignment requirements
+  validate-alignment: func(
+    address: memory-address,
+    alignment: memory-alignment
+  ) -> result<_, string>;
+  
+  // Align an address up to the nearest boundary
+  align-address: func(
+    address: u64,
+    boundary: u32
+  ) -> u64;
+  
+  // Align an address down to the nearest boundary
+  align-address-down: func(
+    address: u64,
+    boundary: u32
+  ) -> u64;
+  
+  // Check if a size is aligned to boundary
+  validate-size-alignment: func(
+    size: u64,
+    boundary: u32
+  ) -> result<_, string>;
+  
+  // Calculate padding needed for alignment
+  calculate-padding: func(
+    current-offset: u64,
+    alignment: u32
+  ) -> u64;
+  
+  // Check if value is power of two (valid alignment)
+  is-power-of-two: func(value: u32) -> bool;
+  
+  // Get next power of two >= value
+  next-power-of-two: func(value: u32) -> u32;
+  
+  // Calculate aligned size (rounds up)
+  align-size: func(
+    size: memory-size,
+    alignment: memory-alignment
+  ) -> memory-size;
+}

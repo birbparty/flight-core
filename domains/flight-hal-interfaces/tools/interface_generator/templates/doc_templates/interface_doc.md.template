@@ -1,0 +1,291 @@
+# {{CLASS_NAME}} - {{PLATFORM_UPPER}} {{INTERFACE_NAME}} Driver
+
+**Generated on:** {{DATE}}
+
+## Overview
+
+The {{CLASS_NAME}} provides a {{PLATFORM}}-specific implementation of the Flight HAL {{INTERFACE_NAME}} interface. This driver leverages platform-native capabilities to deliver optimal performance and functionality for {{PLATFORM}} systems.
+
+## Features
+
+- **Platform Optimized**: Built specifically for {{PLATFORM}} systems
+- **HAL Compliant**: Fully implements the {{INTERFACE_NAME}} interface specification
+- **Auto-Registration**: Automatically registers with the HAL driver registry
+- **Error Handling**: Comprehensive error reporting using HALResult patterns
+- **Thread Safe**: Safe for concurrent access from multiple threads
+- **Resource Managed**: Proper resource acquisition and cleanup
+
+## Requirements
+
+### Platform Requirements
+- {{PLATFORM_UPPER}} operating system
+- C++20 compatible compiler
+- CMake 3.16 or higher
+
+### Dependencies
+- Flight HAL Core Library
+- Flight HAL Interfaces
+{{PLATFORM_SPECIFIC_INCLUDES}}
+
+## Installation
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd {{snake(CLASS_NAME)}}
+
+# Create build directory
+mkdir build && cd build
+
+# Configure and build
+cmake ..
+make -j$(nproc)
+
+# Install (optional)
+make install
+```
+
+### Using with CMake
+
+Add the following to your CMakeLists.txt:
+
+```cmake
+find_package({{CLASS_NAME}} REQUIRED)
+target_link_libraries(your_target PRIVATE flight::hal::{{CLASS_NAME}})
+```
+
+## Usage
+
+### Basic Usage
+
+```cpp
+#include "{{CLASS_NAME}}.hpp"
+#include <flight/hal/core/driver_registry.hpp>
+
+using namespace {{NAMESPACE}};
+
+int main() {
+    // The driver auto-registers itself
+    auto registry = flight::hal::get_driver_registry();
+    
+    // Get the {{INTERFACE_NAME}} interface
+    auto memory_interface = registry->get_interface<flight::hal::{{INTERFACE_NAME}}>();
+    if (!memory_interface) {
+        std::cerr << "{{INTERFACE_NAME}} interface not available" << std::endl;
+        return 1;
+    }
+    
+    // Initialize the interface
+    auto result = memory_interface->initialize();
+    if (!result.is_success()) {
+        std::cerr << "Failed to initialize {{INTERFACE_NAME}}: " 
+                  << result.error_message() << std::endl;
+        return 1;
+    }
+    
+    // Use the interface
+    // TODO: Add specific interface usage examples
+    
+    // Shutdown
+    memory_interface->shutdown();
+    return 0;
+}
+```
+
+### Advanced Configuration
+
+```cpp
+// Check platform capabilities
+const auto& platform_info = memory_interface->get_platform_info();
+std::cout << "Platform: " << platform_info.platform_name << std::endl;
+std::cout << "CPU Count: " << platform_info.cpu_count << std::endl;
+
+// Check driver capabilities
+auto capabilities = memory_interface->get_capabilities();
+for (auto capability : capabilities) {
+    std::cout << "Supports capability: " << static_cast<int>(capability) << std::endl;
+}
+
+// Get performance tier
+auto tier = memory_interface->get_performance_tier();
+std::cout << "Performance tier: " << static_cast<int>(tier) << std::endl;
+```
+
+## API Reference
+
+### Class: {{CLASS_NAME}}
+
+The main driver class implementing the {{INTERFACE_NAME}} interface.
+
+#### Constructor
+
+```cpp
+{{CLASS_NAME}}();
+```
+
+Creates a new instance of the {{PLATFORM}} {{INTERFACE_NAME}} driver.
+
+#### Destructor
+
+```cpp
+~{{CLASS_NAME}}() override;
+```
+
+Cleans up resources and shuts down the driver if still active.
+
+### Interface Methods
+
+TODO: Document all interface methods here. The generated driver implements:
+
+{{METHODS}}
+
+### Platform-Specific Notes
+
+#### {{PLATFORM_UPPER}} Considerations
+
+- **Memory Management**: {{PLATFORM}} systems have specific memory layout requirements
+- **Threading**: Driver is thread-safe and supports concurrent access
+- **Performance**: Optimized for {{PLATFORM}} hardware characteristics
+- **Compatibility**: Compatible with {{PLATFORM}} versions X.X and above
+
+## Error Handling
+
+The driver uses the Flight HAL error handling system with `HALResult<T>` return types:
+
+```cpp
+auto result = memory_interface->some_method();
+if (!result.is_success()) {
+    switch (result.error()) {
+        case HALError::NotInitialized:
+            // Handle not initialized error
+            break;
+        case HALError::InvalidParameter:
+            // Handle invalid parameter error
+            break;
+        default:
+            // Handle other errors
+            break;
+    }
+}
+```
+
+Common error codes:
+- `HALError::Success` - Operation completed successfully
+- `HALError::NotInitialized` - Driver not initialized
+- `HALError::AlreadyInitialized` - Driver already initialized
+- `HALError::InvalidParameter` - Invalid parameter provided
+- `HALError::PlatformNotSupported` - Platform not supported
+- `HALError::ResourceUnavailable` - Required resource unavailable
+
+## Performance Considerations
+
+### Optimization Tips
+
+1. **Initialization**: Initialize once and reuse the interface
+2. **Error Checking**: Check HALResult return values for all operations
+3. **Resource Management**: Properly shutdown the interface when done
+4. **Platform Specifics**: Use platform-appropriate settings and configurations
+
+### Benchmarking
+
+The driver includes performance monitoring capabilities:
+
+```cpp
+// Get performance statistics
+auto stats = memory_interface->get_performance_stats();
+std::cout << "Operations per second: " << stats.ops_per_second << std::endl;
+std::cout << "Average latency: " << stats.avg_latency_us << "μs" << std::endl;
+```
+
+## Testing
+
+### Unit Tests
+
+Run the compliance tests to verify driver functionality:
+
+```bash
+cd build
+ctest -R {{CLASS_NAME}}
+```
+
+### Integration Tests
+
+Integration tests verify the driver works with the full HAL system:
+
+```bash
+cd build
+ctest -R {{CLASS_NAME}}_integration
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Driver Not Found**
+   - Ensure the driver is properly installed
+   - Check that auto-registration is working
+   - Verify platform compatibility
+
+2. **Initialization Failures**
+   - Check platform requirements
+   - Verify system permissions
+   - Review platform-specific configuration
+
+3. **Performance Issues**
+   - Check system resources
+   - Verify platform capabilities
+   - Review configuration settings
+
+### Debug Mode
+
+Enable debug logging to get detailed information:
+
+```cpp
+#define HAL_DEBUG_LOGGING 1
+#include "{{CLASS_NAME}}.hpp"
+```
+
+## Contributing
+
+To contribute to this driver:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+### Code Style
+
+Follow the Flight HAL coding standards:
+- C++20 features preferred
+- RAII for resource management
+- Comprehensive error handling
+- Extensive documentation
+
+## License
+
+This driver is part of the Flight HAL project and is licensed under the same terms.
+
+## Changelog
+
+### Version 1.0.0
+- Initial implementation
+- {{PLATFORM}} platform support
+- Full {{INTERFACE_NAME}} interface compliance
+- Auto-registration support
+- Comprehensive error handling
+
+## Support
+
+For support and questions:
+- GitHub Issues: <repository-issues-url>
+- Documentation: <documentation-url>
+- Examples: See the examples/ directory
+
+---
+
+*This documentation was automatically generated by the Flight HAL Code Generator.*

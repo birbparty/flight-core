@@ -1,0 +1,439 @@
+package flight:component@1.0.0;
+
+/// Component Model infrastructure types for Flight-Core and V6R
+/// 
+/// Provides foundational component lifecycle management, resource handling,
+/// and inter-component communication across Flight-Core and V6R ecosystems
+interface component-types {
+    use flight:memory/memory-types.{memory-size, memory-usage-snapshot};
+    use flight:error/error-types.{flight-result, flight-error};
+    use flight:platform/platform-types.{platform-info};
+    
+    /// Component identification
+    type component-id = string;
+    type instance-id = string;
+    type world-name = string;
+    type interface-name = string;
+    
+    /// Component lifecycle states
+    /// 
+    /// Universal state machine for component management
+    enum component-state {
+        /// Component binary loaded but not instantiated
+        loaded,
+        /// Component instantiating (calling constructors)
+        instantiating,
+        /// Component fully instantiated and ready
+        instantiated,
+        /// Component actively executing
+        running,
+        /// Component execution suspended
+        suspended,
+        /// Component shutting down (calling destructors)
+        terminating,
+        /// Component terminated and resources released
+        terminated,
+        /// Component in error state
+        error,
+    }
+    
+    /// Component metadata and information
+    /// 
+    /// Complete component description for tracking and management
+    record component-info {
+        /// Unique component identifier
+        id: component-id,
+        /// Component name
+        name: string,
+        /// Component version
+        version: string,
+        /// Current lifecycle state
+        state: component-state,
+        /// World interface this component implements
+        world: world-name,
+        /// Platform where component runs
+        platform: string,
+        /// Session this component belongs to
+        session-id: option<string>,
+        /// Component creation time (Unix timestamp)
+        created-at: u64,
+        /// Last activity timestamp (Unix timestamp)
+        last-activity: u64,
+        /// Memory usage by this component
+        memory-usage: memory-usage-snapshot,
+        /// Component-specific metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Component resource management
+    type resource-handle = u32;
+    type resource-type = string;
+    
+    /// Resource ownership information
+    /// 
+    /// Tracks resource ownership and prevents leaks
+    record resource-info {
+        /// Resource handle identifier
+        handle: resource-handle,
+        /// Type of resource (memory, file, network, etc.)
+        resource-type: resource-type,
+        /// Component that owns this resource
+        owner: component-id,
+        /// Reference count for shared resources
+        ref-count: u32,
+        /// Resource creation time (Unix timestamp)
+        created-at: u64,
+        /// Resource size/usage
+        size: memory-size,
+        /// Resource-specific metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Inter-component communication interface
+    /// 
+    /// Type-safe component interface definition
+    record component-interface {
+        /// Interface name
+        name: interface-name,
+        /// Component providing this interface
+        provider: component-id,
+        /// Interface version
+        version: string,
+        /// Interface methods available
+        methods: list<string>,
+        /// Interface state (connected, disconnected, etc.)
+        state: interface-state,
+    }
+    
+    /// Interface connection state
+    enum interface-state {
+        /// Interface available for connection
+        available,
+        /// Interface connected and operational
+        connected,
+        /// Interface temporarily disconnected
+        disconnected,
+        /// Interface deprecated but still functional
+        deprecated,
+        /// Interface no longer available
+        unavailable,
+    }
+    
+    /// Component dependency tracking
+    /// 
+    /// Manages component dependencies and resolution
+    record component-dependency {
+        /// Component that has the dependency
+        dependent: component-id,
+        /// Component or interface being depended on
+        dependency: string,
+        /// Type of dependency
+        dependency-type: dependency-type,
+        /// Whether dependency is optional
+        optional: bool,
+        /// Dependency resolution status
+        resolved: bool,
+    }
+    
+    /// Dependency types for components
+    enum dependency-type {
+        /// Required interface import
+        interface-import,
+        /// Required resource access
+        resource-access,
+        /// Required platform capability
+        platform-capability,
+        /// Required memory allocation
+        memory-requirement,
+        /// Required other component
+        component-dependency,
+    }
+    
+    /// Component execution context
+    /// 
+    /// Runtime execution environment and constraints
+    record execution-context {
+        /// Component being executed
+        component: component-id,
+        /// Current execution stack depth
+        stack-depth: u32,
+        /// Available memory
+        available-memory: memory-size,
+        /// CPU time allocated (milliseconds)
+        cpu-time-ms: u64,
+        /// Execution priority
+        priority: execution-priority,
+        /// Platform execution mode
+        execution-mode: execution-mode,
+    }
+    
+    /// Execution priority levels
+    enum execution-priority {
+        /// Low priority background tasks
+        low,
+        /// Normal priority execution
+        normal,
+        /// High priority interactive tasks
+        high,
+        /// Critical priority system tasks
+        critical,
+    }
+    
+    /// Platform execution modes
+    enum execution-mode {
+        /// Single-threaded execution (Dreamcast)
+        single-threaded,
+        /// Multi-threaded execution
+        multi-threaded,
+        /// Async/await execution
+        async-execution,
+        /// Real-time execution
+        real-time,
+    }
+    
+    /// V6R-specific component extensions
+    /// 
+    /// Cloud-native component features for V6R environments
+    record v6r-component-extensions {
+        /// Container runtime integration
+        container-id: option<string>,
+        /// Kubernetes pod integration
+        pod-name: option<string>,
+        /// Service mesh integration
+        service-mesh-enabled: bool,
+        /// Auto-scaling configuration
+        auto-scaling: v6r-auto-scaling-config,
+        /// Load balancing configuration
+        load-balancing: bool,
+        /// Monitoring and observability
+        monitoring: v6r-monitoring-config,
+    }
+    
+    /// V6R auto-scaling configuration
+    record v6r-auto-scaling-config {
+        /// Minimum component instances
+        min-instances: u32,
+        /// Maximum component instances
+        max-instances: u32,
+        /// CPU utilization trigger percentage
+        cpu-threshold: f32,
+        /// Memory utilization trigger percentage
+        memory-threshold: f32,
+        /// Scaling enabled
+        enabled: bool,
+    }
+    
+    /// V6R monitoring configuration
+    record v6r-monitoring-config {
+        /// Metrics collection enabled
+        metrics-enabled: bool,
+        /// Distributed tracing enabled
+        tracing-enabled: bool,
+        /// Log aggregation enabled
+        logging-enabled: bool,
+        /// Health check configuration
+        health-checks: bool,
+    }
+}
+
+/// Component lifecycle management interface
+/// 
+/// Core operations for component lifecycle management
+interface component-lifecycle {
+    use component-types.{component-id, component-info, component-state,
+                         execution-context, world-name, flight-result};
+    
+    /// Create new component instance
+    /// 
+    /// Creates a component with specified configuration
+    create-component: func(
+        name: string,
+        world: world-name,
+        platform: string,
+        session-id: option<string>
+    ) -> flight-result<component-id>;
+    
+    /// Get component information
+    /// 
+    /// Retrieves complete component information
+    get-component: func(id: component-id) -> flight-result<component-info>;
+    
+    /// Start component execution
+    /// 
+    /// Transitions component to running state
+    start-component: func(id: component-id) -> flight-result<bool>;
+    
+    /// Suspend component execution
+    /// 
+    /// Pauses component execution while preserving state
+    suspend-component: func(id: component-id) -> flight-result<bool>;
+    
+    /// Resume component execution
+    /// 
+    /// Resumes suspended component execution
+    resume-component: func(id: component-id) -> flight-result<bool>;
+    
+    /// Terminate component
+    /// 
+    /// Gracefully shuts down component and releases resources
+    terminate-component: func(id: component-id) -> flight-result<bool>;
+    
+    /// Update component state
+    /// 
+    /// Updates component state with validation
+    update-component-state: func(
+        id: component-id,
+        new-state: component-state
+    ) -> flight-result<bool>;
+    
+    /// List all components
+    /// 
+    /// Lists components with optional filtering
+    list-components: func(
+        session-id: option<string>,
+        state-filter: option<component-state>
+    ) -> flight-result<list<component-info>>;
+    
+    /// Get component execution context
+    /// 
+    /// Retrieves current execution environment
+    get-execution-context: func(
+        id: component-id
+    ) -> flight-result<execution-context>;
+}
+
+/// Component resource management interface
+/// 
+/// Operations for component resource allocation and tracking
+interface component-resources {
+    use component-types.{component-id, resource-handle, resource-info, resource-type,
+                         component-dependency, dependency-type, flight-result};
+    use flight:memory/memory-types.{memory-size};
+    
+    /// Allocate resource for component
+    /// 
+    /// Allocates a new resource and tracks ownership
+    allocate-resource: func(
+        component: component-id,
+        resource-type: resource-type,
+        size: memory-size
+    ) -> flight-result<resource-handle>;
+    
+    /// Release component resource
+    /// 
+    /// Releases resource and updates tracking
+    release-resource: func(
+        handle: resource-handle
+    ) -> flight-result<bool>;
+    
+    /// Get resource information
+    /// 
+    /// Retrieves detailed resource information
+    get-resource: func(
+        handle: resource-handle
+    ) -> flight-result<resource-info>;
+    
+    /// List component resources
+    /// 
+    /// Lists all resources owned by component
+    list-component-resources: func(
+        component: component-id
+    ) -> flight-result<list<resource-info>>;
+    
+    /// Share resource between components
+    /// 
+    /// Shares resource with another component (increments ref count)
+    share-resource: func(
+        handle: resource-handle,
+        target-component: component-id
+    ) -> flight-result<bool>;
+    
+    /// Add component dependency
+    /// 
+    /// Adds a dependency relationship between components
+    add-dependency: func(
+        dependent: component-id,
+        dependency: string,
+        dependency-type: dependency-type,
+        optional: bool
+    ) -> flight-result<bool>;
+    
+    /// Resolve component dependencies
+    /// 
+    /// Resolves all dependencies for a component
+    resolve-dependencies: func(
+        component: component-id
+    ) -> flight-result<list<component-dependency>>;
+    
+    /// Check dependency status
+    /// 
+    /// Validates all component dependencies are resolved
+    check-dependencies: func(
+        component: component-id
+    ) -> flight-result<bool>;
+}
+
+/// Inter-component communication interface
+/// 
+/// Type-safe communication between components
+interface component-communication {
+    use component-types.{component-id, component-interface, interface-state,
+                         interface-name, flight-result};
+    
+    /// Register component interface
+    /// 
+    /// Registers an interface provided by a component
+    register-interface: func(
+        provider: component-id,
+        interface-name: interface-name,
+        version: string,
+        methods: list<string>
+    ) -> flight-result<bool>;
+    
+    /// Connect to component interface
+    /// 
+    /// Establishes connection to a component interface
+    connect-interface: func(
+        consumer: component-id,
+        interface-name: interface-name
+    ) -> flight-result<component-interface>;
+    
+    /// Disconnect from interface
+    /// 
+    /// Disconnects from a component interface
+    disconnect-interface: func(
+        consumer: component-id,
+        interface-name: interface-name
+    ) -> flight-result<bool>;
+    
+    /// List available interfaces
+    /// 
+    /// Lists all available component interfaces
+    list-interfaces: func() -> flight-result<list<component-interface>>;
+    
+    /// Get interface status
+    /// 
+    /// Retrieves current interface connection status
+    get-interface-status: func(
+        interface-name: interface-name
+    ) -> flight-result<interface-state>;
+    
+    /// Send message between components
+    /// 
+    /// Sends a message through a component interface
+    send-message: func(
+        from: component-id,
+        to: component-id,
+        interface-name: interface-name,
+        method: string,
+        payload: string
+    ) -> flight-result<string>;
+}
+
+/// Flight Component World - Component Model entry point
+world flight-component {
+    export component-types;
+    export component-lifecycle;
+    export component-resources;
+    export component-communication;
+}

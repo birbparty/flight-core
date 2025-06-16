@@ -1,0 +1,100 @@
+# Build directories
+build/
+out/
+cmake-build-*/
+.build/
+**/target/
+**/_deps/
+**/node_modules/
+
+domains/flight-shared-types/target/
+
+# CPM Cache
+.cpm_cache/
+.cpm/
+proompts/
+**/proompts/
+
+# IDE specific files
+.cursor/
+.vscode/
+*.code-workspace
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Package manager directories
+vcpkg_installed/
+conan/
+
+# Documentation
+docs/html/
+docs/latex/
+doxygen/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+logs/
+.cache/
+
+# Environment
+.env
+.env.local
+
+# Testing
+coverage/
+.coverage
+.pytest_cache/
+
+# Python
+venv/
+__pycache__/
+*.egg-info/

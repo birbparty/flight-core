@@ -1,0 +1,137 @@
+team_info:
+  name: "Flight Build Pipeline Team"
+  purpose: "Create complete build toolchain with incremental builds and caching"
+  critical_path: false
+  
+dependencies:
+  - project: "flight-component-flattener"
+    team: "Flight Component Flattener Team"
+    features_needed:
+      - "Flattening tool CLI"
+      - "Incremental flattening API"
+      - "Cache-aware operations"
+    blocker: true
+    why: "Need to integrate flattening into pipeline"
+    
+  - project: "flight-simple-runtime"
+    team: "Flight Simple Runtime Team"
+    features_needed:
+      - "Runtime packaging requirements"
+      - "Platform binary formats"
+      - "Debug vs release variants"
+    blocker: false
+    why: "Need to package runtime correctly"
+    
+  - project: "Platform toolchains"
+    team: "Platform HAL teams"
+    features_needed:
+      - "Toolchain specifications"
+      - "Build flags and options"
+      - "Platform packaging formats"
+    blocker: false
+    why: "Need platform-specific build knowledge"
+
+what_we_provide:
+  - feature: "Unified build system"
+    consumers:
+      - "All developers"
+      - "CI/CD systems"
+    format: "CLI tool and build scripts"
+    
+  - feature: "Incremental build cache"
+    consumers:
+      - "Developers"
+      - "CI systems"
+    format: "Local and distributed cache"
+    
+  - feature: "Platform packages"
+    consumers:
+      - "QA teams"
+      - "End users"
+    format: "Platform-specific binaries (ISO, EBOOT, etc.)"
+    
+  - feature: "Build analytics"
+    consumers:
+      - "Performance teams"
+      - "Project managers"
+    format: "Metrics and dashboards"
+
+blocks:
+  - team: "Developers"
+    why: "They need fast iteration"
+    impact: "Slow development cycles"
+    
+  - team: "Release management"
+    why: "They need reliable builds"
+    impact: "Cannot ship games"
+
+deliverables:
+  phase_1:
+    - "Basic build orchestration"
+    - "CMake integration"
+    - "Platform detection"
+    
+  phase_2:
+    - "Incremental build system"
+    - "Local cache implementation"
+    - "Hot reload support"
+    
+  phase_3:
+    - "Distributed cache"
+    - "CI/CD workflows"
+    - "Build analytics"
+
+external_dependencies:
+  - name: "CMake"
+    version: "3.14+"
+    purpose: "Core build system"
+    license: "BSD-3-Clause"
+    
+  - name: "Ninja"
+    version: "1.10+"
+    purpose: "Fast build backend"
+    license: "Apache-2.0"
+    
+  - name: "ccache/sccache"
+    version: "latest"
+    purpose: "Compilation caching"
+    license: "GPL-3.0/Apache-2.0"
+    
+  - name: "Python"
+    version: "3.8+"
+    purpose: "Build orchestration scripts"
+    license: "PSF"
+
+technical_requirements:
+  orchestration_language: "Python 3.8+"
+  performance_tools: "Rust (for critical paths)"
+  build_system: "CMake + Ninja"
+  
+  features:
+    - "File watching"
+    - "Dependency tracking"
+    - "Parallel execution"
+    - "Progress reporting"
+  
+performance_targets:
+  - "Clean build: < 30s"
+  - "Incremental: < 1s"
+  - "Hot reload: < 500ms"
+  - "Cache hit rate: > 90%"
+
+platform_packaging:
+  - platform: "PSX"
+    format: "PS-EXE + ISO"
+    tools: ["mkpsxiso", "psxlicense"]
+    
+  - platform: "PSP"
+    format: "EBOOT.PBP"
+    tools: ["mksfoex", "pack-pbp"]
+    
+  - platform: "Dreamcast"
+    format: "1ST_READ.BIN + CDI"
+    tools: ["makeip", "mkisofs"]
+    
+  - platform: "Modern"
+    format: "Native executable"
+    tools: ["Platform SDK"]

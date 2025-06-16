@@ -1,0 +1,40 @@
+{
+    "name": "flight-memory-components",
+    "sourceRoot": "domains/flight-memory-components",
+    "projectType": "library",
+    "tags": [
+        "domain",
+        "memory",
+        "wit",
+        "component-model"
+    ],
+    "targets": {
+        "build": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+                "commands": [
+                    "cargo build --target wasm32-wasi --manifest-path domains/flight-memory-components/components/Cargo.toml",
+                    "wit-bindgen generate --out-dir domains/flight-memory-components/bindings domains/flight-memory-components/wit/world.wit"
+                ]
+            }
+        },
+        "test": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+                "commands": [
+                    "cargo test --manifest-path domains/flight-memory-components/components/Cargo.toml",
+                    "npm test --prefix domains/flight-memory-components/tests"
+                ]
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/workspace:run-commands",
+            "options": {
+                "commands": [
+                    "cargo clippy --manifest-path domains/flight-memory-components/components/Cargo.toml",
+                    "wit lint domains/flight-memory-components/wit"
+                ]
+            }
+        }
+    }
+}

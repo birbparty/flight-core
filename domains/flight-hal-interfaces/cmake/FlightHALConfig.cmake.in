@@ -1,0 +1,33 @@
+# Flight HAL Interfaces CMake Package Configuration
+# Generated from FlightHALConfig.cmake.in
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Find required dependencies
+find_dependency(Threads REQUIRED)
+
+# Include the targets file
+include("${CMAKE_CURRENT_LIST_DIR}/flight-hal-interfaces-targets.cmake")
+
+# Define the Flight::HAL::Interfaces target
+if(NOT TARGET Flight::HAL::Interfaces)
+    message(FATAL_ERROR "Flight HAL Interfaces target not found")
+endif()
+
+# Provide variables for users
+set(FLIGHT_HAL_INTERFACES_VERSION "@PROJECT_VERSION@")
+set(FLIGHT_HAL_INTERFACES_VERSION_MAJOR "@PROJECT_VERSION_MAJOR@")
+set(FLIGHT_HAL_INTERFACES_VERSION_MINOR "@PROJECT_VERSION_MINOR@")
+set(FLIGHT_HAL_INTERFACES_VERSION_PATCH "@PROJECT_VERSION_PATCH@")
+
+# Mark variables as advanced
+mark_as_advanced(
+    FLIGHT_HAL_INTERFACES_VERSION
+    FLIGHT_HAL_INTERFACES_VERSION_MAJOR
+    FLIGHT_HAL_INTERFACES_VERSION_MINOR
+    FLIGHT_HAL_INTERFACES_VERSION_PATCH
+)
+
+check_required_components(flight-hal-interfaces)

@@ -1,0 +1,70 @@
+# Build directories
+build/
+build-*/
+out/
+.build/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+!cmake/*.cmake
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# Object files
+*.o
+*.obj
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Test outputs
+Testing/
+test_detail.xml
+*.gcov
+*.gcda
+*.gcno
+
+# Documentation generated files
+docs/html/
+docs/latex/
+docs/xml/
+*.dox
+
+# Package files
+*.tar.gz
+*.zip
+*.7z
+
+# Buck2 files (future migration)
+buck-out/
+.buckd/
+
+# Conan files
+conaninfo.txt
+conanbuildinfo.cmake
+conandata.yml
+
+# CPM cache
+_deps/

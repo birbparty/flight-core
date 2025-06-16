@@ -1,0 +1,19 @@
+{
+  "name": "flight-hal-test-input",
+  "projectType": "library",
+  "sourceRoot": "teams/flight-hal-test-input//src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/cmake:build",
+      "options": {
+        "buildDirectory": "build"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/cmake:test",
+      "options": {
+        "testDirectory": "build/tests"
+      }
+    }
+  }
+}

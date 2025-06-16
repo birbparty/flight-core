@@ -1,0 +1,74 @@
+name: WIT Validation
+
+on:
+  push:
+    paths:
+      - 'wit/**'
+      - 'scripts/**'
+      - '.github/workflows/wit-validation.yml'
+  pull_request:
+    paths:
+      - 'wit/**'
+      - 'scripts/**'
+      - '.github/workflows/wit-validation.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      
+      - name: Cache cargo target
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-target-
+      
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      
+      - name: Install WIT toolchain
+        run: ./scripts/install-toolchain.sh
+      
+      - name: Validate WIT interfaces
+        run: ./scripts/validate-wit.sh
+      
+      - name: Generate bindings
+        run: ./scripts/generate-bindings.sh
+      
+      - name: Test generated bindings
+        run: ./scripts/test-bindings.sh
+      
+      - name: Upload bindings as artifacts
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: generated-bindings
+          path: bindings/
+          retention-days: 7

@@ -1,0 +1,254 @@
+/**
+ * @file {{INTERFACE_FILENAME}}_test.cpp
+ * @brief Test skeleton for {{INTERFACE_NAME}} compliance
+ * 
+ * Generated on: {{DATE}}
+ */
+
+#include <gtest/gtest.h>
+#include "../../../include/flight/hal/interfaces/{{INTERFACE_FILENAME}}.hpp"
+#include "../../../tests/compliance/base/hal_interface_compliance_test.hpp"
+#include "../../../tests/mock/mock_driver_base.hpp"
+
+using namespace flight::hal;
+
+namespace {
+
+/**
+ * @brief Mock implementation of {{INTERFACE_NAME}} for testing
+ */
+class Mock{{CLASS_NAME}} : public {{INTERFACE_NAME}}, public MockDriverBase {
+public:
+    Mock{{CLASS_NAME}}() : MockDriverBase("Mock{{CLASS_NAME}}") {}
+    ~Mock{{CLASS_NAME}}() override = default;
+    
+    // === {{INTERFACE_NAME}} Implementation ===
+    // TODO: Add mock implementations for all interface methods
+    // Example:
+    // MOCK_METHOD(HALResult<SomeType>, some_method, (param_type param), (override));
+    
+    // === IHALInterface Implementation ===
+    std::string_view get_driver_name() const override {
+        return "Mock{{CLASS_NAME}}";
+    }
+    
+    int get_priority() const override {
+        return 0;
+    }
+    
+    HALResult<void> initialize() override {
+        return MockDriverBase::initialize();
+    }
+    
+    HALResult<void> shutdown() override {
+        return MockDriverBase::shutdown();
+    }
+    
+    bool is_active() const override {
+        return MockDriverBase::is_active();
+    }
+    
+    bool is_available() const override {
+        return true;
+    }
+    
+    std::string_view get_version() const override {
+        return "1.0.0-test";
+    }
+    
+    // === ICapabilityProvider Implementation ===
+    bool supports_capability(HALCapability capability) const override {
+        return MockDriverBase::supports_capability(capability);
+    }
+    
+    uint32_t get_capability_mask() const override {
+        return MockDriverBase::get_capability_mask();
+    }
+    
+    std::vector<HALCapability> get_capabilities() const override {
+        return MockDriverBase::get_capabilities();
+    }
+    
+    PerformanceTier get_performance_tier() const override {
+        return PerformanceTier::Testing;
+    }
+    
+    const PlatformInfo& get_platform_info() const override {
+        return MockDriverBase::get_platform_info();
+    }
+    
+    bool has_fallback(HALCapability capability) const override {
+        return false;
+    }
+};
+
+} // anonymous namespace
+
+/**
+ * @brief Test fixture for {{INTERFACE_NAME}} compliance tests
+ */
+class {{CLASS_NAME}}ComplianceTest : public HALInterfaceComplianceTest<{{INTERFACE_NAME}}> {
+protected:
+    void SetUp() override {
+        driver_ = std::make_unique<Mock{{CLASS_NAME}}>();
+        HALInterfaceComplianceTest<{{INTERFACE_NAME}}>::SetUp();
+    }
+    
+    void TearDown() override {
+        HALInterfaceComplianceTest<{{INTERFACE_NAME}}>::TearDown();
+    }
+    
+    Mock{{CLASS_NAME}}* GetMockDriver() {
+        return static_cast<Mock{{CLASS_NAME}}*>(driver_.get());
+    }
+};
+
+// === Basic Interface Compliance Tests ===
+
+TEST_F({{CLASS_NAME}}ComplianceTest, DriverBasicFunctionality) {
+    // Test basic driver lifecycle
+    EXPECT_FALSE(driver_->is_active());
+    EXPECT_TRUE(driver_->is_available());
+    
+    auto result = driver_->initialize();
+    EXPECT_TRUE(result.is_success());
+    EXPECT_TRUE(driver_->is_active());
+    
+    result = driver_->shutdown();
+    EXPECT_TRUE(result.is_success());
+    EXPECT_FALSE(driver_->is_active());
+}
+
+TEST_F({{CLASS_NAME}}ComplianceTest, DriverMetadata) {
+    EXPECT_FALSE(driver_->get_driver_name().empty());
+    EXPECT_FALSE(driver_->get_version().empty());
+    EXPECT_GE(driver_->get_priority(), 0);
+}
+
+TEST_F({{CLASS_NAME}}ComplianceTest, CapabilitySystem) {
+    auto capabilities = driver_->get_capabilities();
+    uint32_t mask = driver_->get_capability_mask();
+    
+    // Verify capability consistency
+    for (auto capability : capabilities) {
+        EXPECT_TRUE(driver_->supports_capability(capability));
+        EXPECT_NE(mask & static_cast<uint32_t>(capability), 0u);
+    }
+}
+
+TEST_F({{CLASS_NAME}}ComplianceTest, PlatformInfo) {
+    const auto& platform_info = driver_->get_platform_info();
+    EXPECT_FALSE(platform_info.platform_name.empty());
+    EXPECT_GT(platform_info.cpu_count, 0u);
+    EXPECT_GT(platform_info.page_size, 0u);
+}
+
+// === Interface-Specific Tests ===
+// TODO: Add comprehensive tests for each interface method
+// Example test structure:
+//
+// TEST_F({{CLASS_NAME}}ComplianceTest, SomeMethodBasicFunctionality) {
+//     ASSERT_TRUE(driver_->initialize().is_success());
+//     
+//     // Test basic functionality
+//     auto result = driver_->some_method(valid_params);
+//     EXPECT_TRUE(result.is_success());
+//     
+//     // Test edge cases
+//     result = driver_->some_method(invalid_params);
+//     EXPECT_FALSE(result.is_success());
+//     EXPECT_EQ(result.error(), HALError::InvalidParameter);
+//     
+//     ASSERT_TRUE(driver_->shutdown().is_success());
+// }
+
+TEST_F({{CLASS_NAME}}ComplianceTest, InterfaceMethodsRequireInitialization) {
+    // Ensure driver is not initialized
+    EXPECT_FALSE(driver_->is_active());
+    
+    // TODO: Test that interface methods return NotInitialized error
+    // Example:
+    // auto result = driver_->some_method(params);
+    // EXPECT_FALSE(result.is_success());
+    // EXPECT_EQ(result.error(), HALError::NotInitialized);
+}
+
+TEST_F({{CLASS_NAME}}ComplianceTest, DoubleInitializationHandling) {
+    auto result = driver_->initialize();
+    ASSERT_TRUE(result.is_success());
+    
+    // Second initialization should fail
+    result = driver_->initialize();
+    EXPECT_FALSE(result.is_success());
+    EXPECT_EQ(result.error(), HALError::AlreadyInitialized);
+    
+    ASSERT_TRUE(driver_->shutdown().is_success());
+}
+
+TEST_F({{CLASS_NAME}}ComplianceTest, ShutdownWithoutInitialization) {
+    EXPECT_FALSE(driver_->is_active());
+    
+    auto result = driver_->shutdown();
+    EXPECT_FALSE(result.is_success());
+    EXPECT_EQ(result.error(), HALError::NotInitialized);
+}
+
+// === Performance Tests ===
+
+TEST_F({{CLASS_NAME}}ComplianceTest, PerformanceTier) {
+    auto tier = driver_->get_performance_tier();
+    EXPECT_NE(tier, PerformanceTier::Unknown);
+}
+
+// === Stress Tests ===
+// TODO: Add stress tests for high-frequency operations
+// Example:
+//
+// TEST_F({{CLASS_NAME}}ComplianceTest, HighFrequencyOperations) {
+//     ASSERT_TRUE(driver_->initialize().is_success());
+//     
+//     const int num_iterations = 10000;
+//     for (int i = 0; i < num_iterations; ++i) {
+//         auto result = driver_->some_lightweight_method();
+//         ASSERT_TRUE(result.is_success());
+//     }
+//     
+//     ASSERT_TRUE(driver_->shutdown().is_success());
+// }
+
+// === Thread Safety Tests ===
+// TODO: Add thread safety tests if interface supports concurrent access
+// Example:
+//
+// TEST_F({{CLASS_NAME}}ComplianceTest, ConcurrentAccess) {
+//     ASSERT_TRUE(driver_->initialize().is_success());
+//     
+//     const int num_threads = 4;
+//     const int operations_per_thread = 1000;
+//     std::vector<std::thread> threads;
+//     std::atomic<int> success_count{0};
+//     
+//     for (int t = 0; t < num_threads; ++t) {
+//         threads.emplace_back([&]() {
+//             for (int i = 0; i < operations_per_thread; ++i) {
+//                 auto result = driver_->thread_safe_method();
+//                 if (result.is_success()) {
+//                     success_count++;
+//                 }
+//             }
+//         });
+//     }
+//     
+//     for (auto& thread : threads) {
+//         thread.join();
+//     }
+//     
+//     EXPECT_EQ(success_count.load(), num_threads * operations_per_thread);
+//     ASSERT_TRUE(driver_->shutdown().is_success());
+// }
+
+// Main test runner
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

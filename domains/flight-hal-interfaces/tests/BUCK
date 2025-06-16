@@ -1,0 +1,111 @@
+# Test targets for Buck2 build
+
+# Unit tests
+cxx_test(
+    name = "core-tests",
+    srcs = glob([
+        "unit/core/*_test.cpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_TESTING",
+    ],
+    deps = [
+        "//src/core:hal-core",
+        # "//third_party:googletest",  # Will be enabled when dependencies are migrated
+    ],
+)
+
+cxx_test(
+    name = "interfaces-tests", 
+    srcs = glob([
+        "unit/interfaces/*_test.cpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_TESTING",
+    ],
+    deps = [
+        "//:hal-interfaces",
+        # "//third_party:googletest",
+    ],
+)
+
+cxx_test(
+    name = "platform-tests",
+    srcs = glob([
+        "unit/platform/*_test.cpp", 
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_TESTING",
+    ],
+    deps = [
+        "//:hal-platform",
+        # "//third_party:googletest",
+    ],
+)
+
+# Integration tests
+cxx_test(
+    name = "integration-tests",
+    srcs = glob([
+        "integration/**/*_test.cpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_TESTING",
+        "-DFLIGHT_HAL_INTEGRATION_TEST",
+    ],
+    deps = [
+        "//:flight-hal-interfaces",
+        # "//third_party:googletest",
+    ],
+)
+
+# Stress tests  
+cxx_test(
+    name = "stress-tests",
+    srcs = glob([
+        "stress/**/*_test.cpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_TESTING",
+        "-DFLIGHT_HAL_STRESS_TEST",
+    ],
+    deps = [
+        "//:flight-hal-interfaces",
+        # "//third_party:googletest",
+    ],
+)
+
+# Compliance tests
+cxx_test(
+    name = "compliance-tests",
+    srcs = glob([
+        "compliance/**/*_test.cpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_TESTING",
+        "-DFLIGHT_HAL_COMPLIANCE_TEST",
+    ],
+    deps = [
+        "//:flight-hal-interfaces",
+        # "//third_party:googletest",
+    ],
+)
+
+# All tests target
+cxx_test(
+    name = "all-tests",
+    deps = [
+        ":core-tests",
+        ":interfaces-tests", 
+        ":platform-tests",
+        ":integration-tests",
+        ":stress-tests",
+        ":compliance-tests",
+    ],
+)

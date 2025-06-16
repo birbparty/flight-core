@@ -1,0 +1,704 @@
+package flight:realtime@1.0.0;
+
+/// Real-time communication types for Flight-Core and V6R
+interface realtime-types {
+    use flight:error/error-types.{flight-result, flight-error};
+    use flight:session/session-types.{session-id};
+    use flight:authentication/authentication-types.{auth-token};
+    use flight:memory/memory-types.{memory-usage-snapshot};
+    use flight:component/component-types.{component-info, component-state};
+    
+    /// Real-time connection identifier
+    type connection-id = string;
+    type channel-id = string;
+    type message-id = string;
+    
+    /// WebSocket connection state
+    enum connection-state {
+        /// Connection being established
+        connecting,
+        /// Connection established and ready
+        connected,
+        /// Connection temporarily disconnected
+        disconnected,
+        /// Connection being closed
+        closing,
+        /// Connection closed
+        closed,
+        /// Connection error state
+        error,
+        /// Connection authenticated and authorized
+        authenticated,
+    }
+    
+    /// Connection information
+    record connection-info {
+        /// Unique connection identifier
+        id: connection-id,
+        /// Current connection state
+        state: connection-state,
+        /// Connection establishment time
+        connected-at: u64,
+        /// Last activity timestamp
+        last-activity: u64,
+        /// User associated with connection
+        user-id: option<string>,
+        /// Session associated with connection
+        session-id: option<session-id>,
+        /// Platform this connection originates from
+        platform: string,
+        /// Client information
+        client-info: client-info,
+        /// Connection metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Client information for connection
+    record client-info {
+        /// Client type (browser, native, mobile, etc.)
+        client-type: client-type,
+        /// Client version
+        version: string,
+        /// Client platform/OS
+        platform: string,
+        /// Client capabilities
+        capabilities: list<string>,
+        /// User agent string
+        user-agent: option<string>,
+        /// Client IP address
+        ip-address: option<string>,
+    }
+    
+    /// Types of clients connecting
+    enum client-type {
+        /// Web browser client
+        web-browser,
+        /// Flight-Core native application
+        flight-native,
+        /// V6R mobile application
+        v6r-mobile,
+        /// V6R CLI tool
+        v6r-cli,
+        /// V6R bridge service
+        v6r-bridge,
+        /// Development tool
+        development-tool,
+        /// Monitoring service
+        monitoring-service,
+        /// API client
+        api-client,
+        /// Unknown client type
+        unknown,
+    }
+    
+    /// Real-time message representation
+    record realtime-message {
+        /// Message unique identifier
+        id: message-id,
+        /// Message type/event name
+        message-type: string,
+        /// Channel this message belongs to
+        channel-id: channel-id,
+        /// Message payload (JSON string)
+        payload: string,
+        /// Message timestamp
+        timestamp: u64,
+        /// Message sender
+        sender: option<string>,
+        /// Message target (specific user/session)
+        target: option<string>,
+        /// Message priority
+        priority: message-priority,
+        /// Message routing information
+        routing: message-routing,
+        /// Message metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Message priority levels
+    enum message-priority {
+        /// Low priority background messages
+        low,
+        /// Normal priority messages
+        normal,
+        /// High priority interactive messages
+        high,
+        /// Critical priority system messages
+        critical,
+        /// Real-time priority (immediate delivery)
+        realtime,
+    }
+    
+    /// Message routing information
+    record message-routing {
+        /// Source of the message
+        source: string,
+        /// Route the message took
+        route: list<string>,
+        /// Message expiration time
+        expires-at: option<u64>,
+        /// Whether message requires acknowledgment
+        requires-ack: bool,
+        /// Retry configuration
+        retry-config: option<retry-config>,
+    }
+    
+    /// Message retry configuration
+    record retry-config {
+        /// Maximum retry attempts
+        max-retries: u32,
+        /// Retry interval in milliseconds
+        retry-interval-ms: u64,
+        /// Exponential backoff multiplier
+        backoff-multiplier: f32,
+        /// Maximum retry interval
+        max-retry-interval-ms: u64,
+    }
+    
+    /// Real-time channel definition
+    record channel-info {
+        /// Channel unique identifier
+        id: channel-id,
+        /// Channel name/topic
+        name: string,
+        /// Channel type
+        channel-type: channel-type,
+        /// Channel permissions required
+        required-permissions: list<string>,
+        /// Maximum connections allowed
+        max-connections: option<u32>,
+        /// Channel created time
+        created-at: u64,
+        /// Channel metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Types of real-time channels
+    enum channel-type {
+        /// Public broadcast channel
+        public-broadcast,
+        /// Private user channel
+        private-user,
+        /// Session-specific channel
+        session-private,
+        /// System monitoring channel
+        system-monitoring,
+        /// Memory usage updates
+        memory-updates,
+        /// Component lifecycle events
+        component-events,
+        /// V6R VM management
+        v6r-vm-management,
+        /// Flight-Core HAL events
+        flight-hal-events,
+        /// Development/debugging channel
+        development,
+    }
+    
+    /// Subscription to real-time channel
+    record subscription {
+        /// Subscription identifier
+        id: string,
+        /// Connection making the subscription
+        connection-id: connection-id,
+        /// Channel being subscribed to
+        channel-id: channel-id,
+        /// Subscription filters
+        filters: list<subscription-filter>,
+        /// Subscription created time
+        subscribed-at: u64,
+        /// Last activity on subscription
+        last-activity: u64,
+        /// Subscription metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Subscription filter for selective message delivery
+    record subscription-filter {
+        /// Filter field name
+        field: string,
+        /// Filter operation
+        operation: filter-operation,
+        /// Filter value
+        value: string,
+    }
+    
+    /// Filter operations for subscriptions
+    enum filter-operation {
+        /// Exact match
+        equals,
+        /// Not equal
+        not-equals,
+        /// Contains substring
+        contains,
+        /// Starts with
+        starts-with,
+        /// Ends with
+        ends-with,
+        /// Regular expression match
+        regex,
+        /// Greater than (for numeric values)
+        greater-than,
+        /// Less than (for numeric values)
+        less-than,
+    }
+    
+    /// Real-time event types for streaming
+    variant realtime-event {
+        /// Memory usage update event
+        memory-update(memory-usage-snapshot),
+        /// Component state change event
+        component-update(component-info),
+        /// Session lifecycle event
+        session-event(session-event),
+        /// Authentication event
+        auth-event(auth-event),
+        /// System health event
+        system-event(system-event),
+        /// V6R specific events
+        v6r-event(v6r-event),
+        /// Flight-Core specific events
+        flight-event(flight-event),
+        /// Custom application event
+        custom-event(custom-event),
+    }
+    
+    /// Session lifecycle events
+    record session-event {
+        /// Event type
+        event-type: session-event-type,
+        /// Session identifier
+        session-id: session-id,
+        /// User identifier
+        user-id: option<string>,
+        /// Platform information
+        platform: string,
+        /// Event timestamp
+        timestamp: u64,
+        /// Event metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Types of session events
+    enum session-event-type {
+        /// Session created
+        session-created,
+        /// Session activated
+        session-activated,
+        /// Session suspended
+        session-suspended,
+        /// Session terminated
+        session-terminated,
+        /// Session expired
+        session-expired,
+        /// Session error
+        session-error,
+    }
+    
+    /// Authentication events
+    record auth-event {
+        /// Event type
+        event-type: auth-event-type,
+        /// User identifier
+        user-id: string,
+        /// Platform information
+        platform: string,
+        /// Event timestamp
+        timestamp: u64,
+        /// Event metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Types of authentication events
+    enum auth-event-type {
+        /// User authenticated
+        user-authenticated,
+        /// User logged out
+        user-logged-out,
+        /// Token refreshed
+        token-refreshed,
+        /// Token expired
+        token-expired,
+        /// Authentication failed
+        auth-failed,
+        /// Permission granted
+        permission-granted,
+        /// Permission revoked
+        permission-revoked,
+    }
+    
+    /// System health events
+    record system-event {
+        /// Event type
+        event-type: system-event-type,
+        /// System component
+        component: string,
+        /// Platform information
+        platform: string,
+        /// Event severity
+        severity: event-severity,
+        /// Event message
+        message: string,
+        /// Event timestamp
+        timestamp: u64,
+        /// Event metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Types of system events
+    enum system-event-type {
+        /// System startup
+        system-startup,
+        /// System shutdown
+        system-shutdown,
+        /// Component loaded
+        component-loaded,
+        /// Component unloaded
+        component-unloaded,
+        /// Error occurred
+        error-occurred,
+        /// Performance warning
+        performance-warning,
+        /// Memory pressure
+        memory-pressure,
+        /// Resource exhaustion
+        resource-exhausted,
+    }
+    
+    /// Event severity levels
+    enum event-severity {
+        /// Informational event
+        info,
+        /// Warning event
+        warning,
+        /// Error event
+        error,
+        /// Critical error event
+        critical,
+        /// Fatal error event
+        fatal,
+    }
+    
+    /// V6R specific events
+    record v6r-event {
+        /// Event type
+        event-type: v6r-event-type,
+        /// V6R resource information
+        resource: string,
+        /// Organization/team context
+        organization: option<string>,
+        /// Event timestamp
+        timestamp: u64,
+        /// Event metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Types of V6R events
+    enum v6r-event-type {
+        /// VM created
+        vm-created,
+        /// VM started
+        vm-started,
+        /// VM stopped
+        vm-stopped,
+        /// VM deleted
+        vm-deleted,
+        /// VM scaling
+        vm-scaling,
+        /// Resource quota exceeded
+        quota-exceeded,
+        /// Billing event
+        billing-event,
+        /// Team member added
+        team-member-added,
+        /// Team member removed
+        team-member-removed,
+    }
+    
+    /// Flight-Core specific events
+    record flight-event {
+        /// Event type
+        event-type: flight-event-type,
+        /// Platform context
+        platform: string,
+        /// HAL subsystem (if applicable)
+        hal-subsystem: option<string>,
+        /// Event timestamp
+        timestamp: u64,
+        /// Event metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Types of Flight-Core events
+    enum flight-event-type {
+        /// Platform detected
+        platform-detected,
+        /// HAL initialized
+        hal-initialized,
+        /// Component loaded
+        component-loaded,
+        /// Memory pool created
+        memory-pool-created,
+        /// Runtime started
+        runtime-started,
+        /// Performance milestone
+        performance-milestone,
+    }
+    
+    /// Custom application event
+    record custom-event {
+        /// Event name
+        name: string,
+        /// Event data (JSON)
+        data: string,
+        /// Application context
+        application: string,
+        /// Event timestamp
+        timestamp: u64,
+        /// Event metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Real-time metrics for monitoring
+    record realtime-metrics {
+        /// Active connections count
+        active-connections: u32,
+        /// Total messages sent
+        messages-sent: u64,
+        /// Total messages received
+        messages-received: u64,
+        /// Messages per second
+        messages-per-second: f32,
+        /// Average message latency (ms)
+        avg-latency-ms: f32,
+        /// Connection error rate
+        error-rate: f32,
+        /// Memory usage for real-time system
+        memory-usage: u64,
+        /// Active subscriptions count
+        active-subscriptions: u32,
+        /// Metrics collection time
+        collected-at: u64,
+    }
+}
+
+/// Real-time connection management interface
+interface realtime-connection {
+    use realtime-types.{connection-id, connection-info, connection-state,
+                        client-info, flight-result};
+    
+    /// Establish real-time connection
+    establish-connection: func(
+        client-info: client-info,
+        auth-token: option<string>,
+        platform: string
+    ) -> flight-result<connection-info>;
+    
+    /// Close real-time connection
+    close-connection: func(
+        connection-id: connection-id,
+        reason: string
+    ) -> flight-result<bool>;
+    
+    /// Get connection information
+    get-connection: func(
+        connection-id: connection-id
+    ) -> flight-result<connection-info>;
+    
+    /// List active connections
+    list-connections: func(
+        user-id: option<string>,
+        platform: option<string>
+    ) -> flight-result<list<connection-info>>;
+    
+    /// Update connection state
+    update-connection-state: func(
+        connection-id: connection-id,
+        new-state: connection-state
+    ) -> flight-result<bool>;
+    
+    /// Authenticate connection
+    authenticate-connection: func(
+        connection-id: connection-id,
+        auth-token: string
+    ) -> flight-result<bool>;
+}
+
+/// Real-time messaging interface
+interface realtime-messaging {
+    use realtime-types.{connection-id, channel-id, message-id, realtime-message,
+                        message-priority, realtime-event, flight-result};
+    
+    /// Send real-time message
+    send-message: func(
+        connection-id: connection-id,
+        message: realtime-message
+    ) -> flight-result<bool>;
+    
+    /// Broadcast message to channel
+    broadcast-message: func(
+        channel-id: channel-id,
+        message: realtime-message
+    ) -> flight-result<u32>; // Returns number of recipients
+    
+    /// Send event to specific user
+    send-user-event: func(
+        user-id: string,
+        event: realtime-event,
+        platform: option<string>
+    ) -> flight-result<bool>;
+    
+    /// Broadcast event to all subscribers
+    broadcast-event: func(
+        channel-id: channel-id,
+        event: realtime-event
+    ) -> flight-result<u32>; // Returns number of recipients
+    
+    /// Send message with priority
+    send-priority-message: func(
+        connection-id: connection-id,
+        message: realtime-message,
+        priority: message-priority
+    ) -> flight-result<bool>;
+    
+    /// Get message history for channel
+    get-message-history: func(
+        channel-id: channel-id,
+        limit: u32,
+        before: option<u64>
+    ) -> flight-result<list<realtime-message>>;
+}
+
+/// Real-time subscription management interface
+interface realtime-subscription {
+    use realtime-types.{connection-id, channel-id, subscription, 
+                        subscription-filter, channel-info, flight-result};
+    
+    /// Subscribe to channel
+    subscribe-to-channel: func(
+        connection-id: connection-id,
+        channel-id: channel-id,
+        filters: option<list<subscription-filter>>
+    ) -> flight-result<subscription>;
+    
+    /// Unsubscribe from channel
+    unsubscribe-from-channel: func(
+        connection-id: connection-id,
+        channel-id: channel-id
+    ) -> flight-result<bool>;
+    
+    /// Create new channel
+    create-channel: func(
+        channel-info: channel-info
+    ) -> flight-result<channel-id>;
+    
+    /// Delete channel
+    delete-channel: func(
+        channel-id: channel-id
+    ) -> flight-result<bool>;
+    
+    /// List available channels
+    list-channels: func(
+        user-id: option<string>,
+        platform: option<string>
+    ) -> flight-result<list<channel-info>>;
+    
+    /// Get channel subscribers
+    get-channel-subscribers: func(
+        channel-id: channel-id
+    ) -> flight-result<list<connection-id>>;
+    
+    /// Update subscription filters
+    update-subscription-filters: func(
+        connection-id: connection-id,
+        channel-id: channel-id,
+        filters: list<subscription-filter>
+    ) -> flight-result<bool>;
+}
+
+/// Real-time analytics and monitoring interface
+interface realtime-analytics {
+    use realtime-types.{realtime-metrics, connection-info, channel-info,
+                        realtime-message, realtime-event, flight-result};
+    
+    /// Get real-time system metrics
+    get-realtime-metrics: func() -> flight-result<realtime-metrics>;
+    
+    /// Get connection analytics
+    get-connection-analytics: func(
+        time-window-hours: u32
+    ) -> flight-result<connection-analytics>;
+    
+    /// Get message analytics  
+    get-message-analytics: func(
+        channel-id: option<channel-id>,
+        time-window-hours: u32
+    ) -> flight-result<message-analytics>;
+    
+    /// Connection analytics data
+    record connection-analytics {
+        /// Total connections in time window
+        total-connections: u32,
+        /// Peak concurrent connections
+        peak-connections: u32,
+        /// Average connection duration
+        avg-connection-duration: f32,
+        /// Connections by client type
+        connections-by-type: list<tuple<client-type, u32>>,
+        /// Connections by platform
+        connections-by-platform: list<tuple<string, u32>>,
+        /// Connection error rate
+        error-rate: f32,
+    }
+    
+    /// Message analytics data
+    record message-analytics {
+        /// Total messages sent
+        total-messages: u64,
+        /// Messages by priority
+        messages-by-priority: list<tuple<message-priority, u64>>,
+        /// Average message size
+        avg-message-size: u32,
+        /// Message delivery success rate
+        delivery-success-rate: f32,
+        /// Average message latency
+        avg-latency-ms: f32,
+        /// Messages by event type
+        messages-by-event-type: list<tuple<string, u64>>,
+    }
+    
+    /// Generate real-time system health report
+    generate-health-report: func() -> flight-result<string>;
+    
+    /// Get platform performance metrics
+    get-platform-performance: func(
+        platform: string
+    ) -> flight-result<platform-performance>;
+    
+    /// Platform performance metrics
+    record platform-performance {
+        /// Platform identifier
+        platform: string,
+        /// Active connections for platform
+        active-connections: u32,
+        /// Message throughput (messages/sec)
+        message-throughput: f32,
+        /// Average response time
+        avg-response-time-ms: f32,
+        /// Error rate for platform
+        error-rate: f32,
+        /// Memory usage for platform connections
+        memory-usage-bytes: u64,
+        /// Platform-specific metrics
+        platform-metrics: list<tuple<string, f32>>,
+    }
+}
+
+/// Flight Realtime World - Component Model entry point
+world flight-realtime {
+    export realtime-types;
+    export realtime-connection;
+    export realtime-messaging;
+    export realtime-subscription;
+    export realtime-analytics;
+}

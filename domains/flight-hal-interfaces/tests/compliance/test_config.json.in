@@ -1,0 +1,18 @@
+{
+  "test_configuration": {
+    "platform": "@FLIGHT_HAL_PLATFORM@",
+    "build_type": "@CMAKE_BUILD_TYPE@",
+    "version": "@PROJECT_VERSION@",
+    "test_timeout_seconds": 30,
+    "max_memory_usage_mb": @FLIGHT_HAL_MAX_MEMORY_TEST@,
+    "enable_stress_tests": true,
+    "enable_performance_tests": true,
+    "enable_error_injection": true,
+    "platform_limits": {
+      "max_allocation_size": 104857600,
+      "max_latency_microseconds": 1000,
+      "min_throughput_ops_per_sec": 1000.0,
+      "max_concurrent_operations": 64
+    }
+  }
+}

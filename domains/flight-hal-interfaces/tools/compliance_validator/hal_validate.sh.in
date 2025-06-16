@@ -1,0 +1,164 @@
+#!/bin/bash
+
+# HAL Validation Convenience Script
+# Provides easy access to common validation tasks
+
+HAL_VALIDATOR="@CMAKE_INSTALL_PREFIX@/bin/hal_validator"
+
+# Function to show usage
+show_usage() {
+    echo "HAL Validation Convenience Script"
+    echo ""
+    echo "Usage: $0 [COMMAND] [OPTIONS]"
+    echo ""
+    echo "Commands:"
+    echo "  validate-all [platform]     - Run all validations for specified platform"
+    echo "  validate-interface <name>   - Validate specific interface"
+    echo "  validate-memory            - Validate memory interface"
+    echo "  validate-graphics          - Validate graphics interface"
+    echo "  validate-audio             - Validate audio interface"
+    echo "  list-validators            - List available validators"
+    echo "  list-platforms             - List supported platforms"
+    echo "  help                       - Show this help message"
+    echo ""
+    echo "Options:"
+    echo "  --platform PLATFORM       - Target platform (dreamcast, psp, web, macos, windows, linux)"
+    echo "  --output FORMAT           - Output format (console, json)"
+    echo "  --output-file FILE        - Write output to file"
+    echo "  --verbose                 - Enable verbose output"
+    echo ""
+    echo "Examples:"
+    echo "  $0 validate-all dreamcast"
+    echo "  $0 validate-memory --platform psp --output json"
+    echo "  $0 validate-interface IGraphicsInterface --platform web"
+}
+
+# Parse command line arguments
+COMMAND=""
+INTERFACE=""
+PLATFORM=""
+OUTPUT_FORMAT="console"
+OUTPUT_FILE=""
+VERBOSE=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        validate-all)
+            COMMAND="validate-all"
+            if [[ -n $2 && $2 != --* ]]; then
+                PLATFORM="$2"
+                shift
+            fi
+            shift
+            ;;
+        validate-interface)
+            COMMAND="validate-interface"
+            if [[ -n $2 && $2 != --* ]]; then
+                INTERFACE="$2"
+                shift
+            fi
+            shift
+            ;;
+        validate-memory)
+            COMMAND="validate-interface"
+            INTERFACE="IMemoryInterface"
+            shift
+            ;;
+        validate-graphics)
+            COMMAND="validate-interface"
+            INTERFACE="IGraphicsInterface"
+            shift
+            ;;
+        validate-audio)
+            COMMAND="validate-interface"
+            INTERFACE="IAudioInterface"
+            shift
+            ;;
+        list-validators)
+            COMMAND="list-validators"
+            shift
+            ;;
+        list-platforms)
+            COMMAND="list-platforms"
+            shift
+            ;;
+        help|--help|-h)
+            show_usage
+            exit 0
+            ;;
+        --platform)
+            PLATFORM="$2"
+            shift 2
+            ;;
+        --output)
+            OUTPUT_FORMAT="$2"
+            shift 2
+            ;;
+        --output-file)
+            OUTPUT_FILE="$2"
+            shift 2
+            ;;
+        --verbose)
+            VERBOSE="--verbose"
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_usage
+            exit 1
+            ;;
+    esac
+done
+
+# Check if hal_validator exists
+if [[ ! -x "$HAL_VALIDATOR" ]]; then
+    echo "Error: HAL validator not found at $HAL_VALIDATOR"
+    echo "Please ensure the HAL validation tools are properly installed."
+    exit 1
+fi
+
+# Build command arguments
+ARGS=()
+
+case $COMMAND in
+    validate-all)
+        ARGS+=("--all")
+        [[ -n $PLATFORM ]] && ARGS+=("--platform" "$PLATFORM")
+        ;;
+    validate-interface)
+        if [[ -z $INTERFACE ]]; then
+            echo "Error: Interface name required for validate-interface command"
+            exit 1
+        fi
+        ARGS+=("--interface" "$INTERFACE")
+        [[ -n $PLATFORM ]] && ARGS+=("--platform" "$PLATFORM")
+        ;;
+    list-validators)
+        ARGS+=("--list-validators")
+        ;;
+    list-platforms)
+        ARGS+=("--list-platforms")
+        ;;
+    "")
+        echo "Error: No command specified"
+        show_usage
+        exit 1
+        ;;
+    *)
+        echo "Error: Unknown command: $COMMAND"
+        show_usage
+        exit 1
+        ;;
+esac
+
+# Add common options
+[[ -n $OUTPUT_FORMAT ]] && ARGS+=("--output" "$OUTPUT_FORMAT")
+[[ -n $OUTPUT_FILE ]] && ARGS+=("--output-file" "$OUTPUT_FILE")
+[[ -n $VERBOSE ]] && ARGS+=("$VERBOSE")
+
+# Execute the validator
+echo "Running HAL validation..."
+echo "Command: $HAL_VALIDATOR ${ARGS[*]}"
+echo ""
+
+exec "$HAL_VALIDATOR" "${ARGS[@]}"

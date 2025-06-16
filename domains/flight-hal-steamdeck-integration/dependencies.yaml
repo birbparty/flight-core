@@ -1,0 +1,14 @@
+team_info:
+  name: "steamdeck Platform Integration Team"
+  purpose: "Integrate all steamdeck subsystems into cohesive platform"
+  
+dependencies:
+  - project: "flight-hal-steamdeck-memory"
+    team: "steamdeck Memory Team"
+    features:
+      - "Complete memory management"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Platform interface"
+      - "Driver registry"

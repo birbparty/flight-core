@@ -1,0 +1,374 @@
+package flight:authentication@1.0.0;
+
+/// Authentication and authorization types for Flight-Core and V6R
+interface authentication-types {
+    use flight:error/error-types.{flight-result, flight-error};
+    use flight:session/session-types.{session-id, session-info};
+    use flight:platform/platform-types.{platform-type};
+    
+    /// Authentication token representation
+    record auth-token {
+        /// Token value (encrypted)
+        token: string,
+        /// Token type (bearer, api-key, session, etc.)
+        token-type: token-type,
+        /// Token expiration timestamp
+        expires-at: u64,
+        /// Refresh token for token renewal
+        refresh-token: option<string>,
+        /// Token scope permissions
+        scopes: list<string>,
+        /// Token issuer
+        issuer: string,
+        /// Platform this token is valid for
+        platform: option<string>,
+        /// Token metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Types of authentication tokens
+    enum token-type {
+        /// Bearer token for API access
+        bearer,
+        /// API key for service authentication
+        api-key,
+        /// Session token for user sessions
+        session,
+        /// JWT token for cross-service auth
+        jwt,
+        /// Platform-specific token (Dreamcast, PSP, etc.)
+        platform-specific,
+        /// V6R development environment token
+        v6r-development,
+        /// V6R production service token
+        v6r-production,
+    }
+    
+    /// User authentication information
+    record user-auth {
+        /// User unique identifier
+        user-id: string,
+        /// Username/email
+        username: string,
+        /// Authentication provider
+        provider: auth-provider,
+        /// User roles
+        roles: list<user-role>,
+        /// User permissions
+        permissions: list<permission>,
+        /// Authentication timestamp
+        authenticated-at: u64,
+        /// Last activity timestamp
+        last-activity: u64,
+        /// Platform where user is authenticated
+        platform: string,
+        /// User metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Authentication providers
+    enum auth-provider {
+        /// Local Flight-Core authentication
+        flight-local,
+        /// V6R cloud authentication
+        v6r-cloud,
+        /// OAuth2 provider
+        oauth2,
+        /// LDAP authentication
+        ldap,
+        /// API key authentication
+        api-key,
+        /// Guest/anonymous access
+        guest,
+        /// Platform-specific auth (Dreamcast memory card, etc.)
+        platform-native,
+    }
+    
+    /// User roles in the system
+    enum user-role {
+        /// System administrator
+        admin,
+        /// Regular user
+        user,
+        /// Developer with extended permissions
+        developer,
+        /// V6R service account
+        service-account,
+        /// Guest user with limited access
+        guest,
+        /// Flight-Core platform operator
+        platform-operator,
+        /// V6R VM manager
+        vm-manager,
+        /// Read-only observer
+        observer,
+    }
+    
+    /// Permission definitions
+    enum permission {
+        /// Read access to resources
+        read,
+        /// Write access to resources
+        write,
+        /// Execute operations
+        execute,
+        /// Administrative operations
+        admin,
+        /// Create new resources
+        create,
+        /// Delete resources
+        delete,
+        /// Manage user sessions
+        manage-sessions,
+        /// Manage V6R VMs
+        manage-vms,
+        /// Access Flight-Core HAL
+        access-hal,
+        /// Manage component lifecycle
+        manage-components,
+        /// View system metrics
+        view-metrics,
+        /// Configure platform settings
+        configure-platform,
+    }
+    
+    /// Authentication state
+    enum auth-state {
+        /// User not authenticated
+        unauthenticated,
+        /// User authentication in progress
+        authenticating,
+        /// User successfully authenticated
+        authenticated,
+        /// Authentication expired
+        expired,
+        /// Authentication revoked
+        revoked,
+        /// Authentication error
+        error,
+    }
+    
+    /// Authentication context
+    record auth-context {
+        /// Authentication state
+        state: auth-state,
+        /// Current user authentication
+        user-auth: option<user-auth>,
+        /// Active authentication token
+        token: option<auth-token>,
+        /// Session associated with authentication
+        session-id: option<session-id>,
+        /// Platform context
+        platform: string,
+        /// Authentication provider used
+        provider: auth-provider,
+        /// Authentication metadata
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Permission check request
+    record permission-check {
+        /// User to check permissions for
+        user-id: string,
+        /// Resource being accessed
+        resource: string,
+        /// Action being performed
+        action: string,
+        /// Context for permission check
+        context: option<string>,
+        /// Platform where check is performed
+        platform: string,
+    }
+    
+    /// Permission check result
+    record permission-result {
+        /// Whether permission is granted
+        granted: bool,
+        /// Reason for grant/denial
+        reason: string,
+        /// Required roles for access
+        required-roles: list<user-role>,
+        /// Required permissions for access
+        required-permissions: list<permission>,
+        /// Effective permissions granted
+        effective-permissions: list<permission>,
+    }
+    
+    /// V6R-specific authentication extensions
+    record v6r-auth-extensions {
+        /// V6R organization ID
+        organization-id: option<string>,
+        /// V6R team membership
+        team-memberships: list<string>,
+        /// V6R subscription tier
+        subscription-tier: v6r-subscription-tier,
+        /// V6R resource quotas
+        resource-quotas: v6r-resource-quotas,
+        /// V6R billing information
+        billing-enabled: bool,
+    }
+    
+    /// V6R subscription tiers
+    enum v6r-subscription-tier {
+        /// Free tier with basic limits
+        free,
+        /// Individual developer tier
+        individual,
+        /// Team tier with collaboration features
+        team,
+        /// Enterprise tier with advanced features
+        enterprise,
+        /// Custom enterprise tier
+        custom,
+    }
+    
+    /// V6R resource quotas
+    record v6r-resource-quotas {
+        /// Maximum concurrent VMs
+        max-vms: u32,
+        /// Maximum memory per VM (bytes)
+        max-vm-memory: u64,
+        /// Maximum storage per user (bytes)
+        max-storage: u64,
+        /// Maximum API calls per hour
+        max-api-calls: u32,
+        /// Maximum concurrent sessions
+        max-sessions: u32,
+    }
+    
+    /// Flight-Core platform authentication
+    record flight-auth-extensions {
+        /// Platform capabilities required
+        required-capabilities: list<string>,
+        /// HAL access permissions
+        hal-permissions: list<string>,
+        /// Component access permissions
+        component-permissions: list<string>,
+        /// Memory access permissions
+        memory-permissions: list<string>,
+        /// Platform-specific settings
+        platform-settings: list<tuple<string, string>>,
+    }
+}
+
+/// Authentication management interface
+interface authentication-manager {
+    use authentication-types.{auth-token, user-auth, auth-context, auth-provider,
+                               permission-check, permission-result, flight-result,
+                               token-type, user-role};
+    
+    /// Authenticate user with credentials
+    authenticate-user: func(
+        username: string,
+        credentials: string,
+        provider: auth-provider,
+        platform: string
+    ) -> flight-result<auth-context>;
+    
+    /// Validate authentication token
+    validate-token: func(
+        token: string,
+        platform: string
+    ) -> flight-result<auth-context>;
+    
+    /// Refresh authentication token
+    refresh-token: func(
+        refresh-token: string,
+        platform: string
+    ) -> flight-result<auth-token>;
+    
+    /// Revoke authentication token
+    revoke-token: func(
+        token: string,
+        platform: string
+    ) -> flight-result<bool>;
+    
+    /// Check user permissions
+    check-permission: func(
+        check: permission-check
+    ) -> flight-result<permission-result>;
+    
+    /// Get user authentication info
+    get-user-auth: func(
+        user-id: string,
+        platform: string
+    ) -> flight-result<user-auth>;
+    
+    /// Update user roles
+    update-user-roles: func(
+        user-id: string,
+        roles: list<user-role>,
+        platform: string
+    ) -> flight-result<bool>;
+    
+    /// Create authentication token
+    create-token: func(
+        user-id: string,
+        token-type: token-type,
+        scopes: list<string>,
+        expires-in-seconds: u64,
+        platform: string
+    ) -> flight-result<auth-token>;
+    
+    /// List active sessions for user
+    list-user-sessions: func(
+        user-id: string,
+        platform: string
+    ) -> flight-result<list<session-id>>;
+}
+
+/// Authorization interface for permission management
+interface authorization {
+    use authentication-types.{user-role, permission, permission-check, 
+                               permission-result, flight-result};
+    
+    /// Define role permissions
+    define-role-permissions: func(
+        role: user-role,
+        permissions: list<permission>,
+        platform: string
+    ) -> flight-result<bool>;
+    
+    /// Get role permissions
+    get-role-permissions: func(
+        role: user-role,
+        platform: string
+    ) -> flight-result<list<permission>>;
+    
+    /// Check if user has specific permission
+    has-permission: func(
+        user-id: string,
+        permission: permission,
+        resource: string,
+        platform: string
+    ) -> flight-result<bool>;
+    
+    /// Grant permission to user
+    grant-permission: func(
+        user-id: string,
+        permission: permission,
+        resource: string,
+        platform: string
+    ) -> flight-result<bool>;
+    
+    /// Revoke permission from user
+    revoke-permission: func(
+        user-id: string,
+        permission: permission,
+        resource: string,
+        platform: string
+    ) -> flight-result<bool>;
+    
+    /// Get effective permissions for user
+    get-effective-permissions: func(
+        user-id: string,
+        platform: string
+    ) -> flight-result<list<permission>>;
+}
+
+/// Flight Authentication World - Component Model entry point
+world flight-authentication {
+    export authentication-types;
+    export authentication-manager;
+    export authorization;
+}

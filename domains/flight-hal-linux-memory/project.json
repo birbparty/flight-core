@@ -1,0 +1,19 @@
+{
+  "name": "flight-hal-linux-memory",
+  "projectType": "library",
+  "sourceRoot": "teams/flight-hal-linux-memory//src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/cmake:build",
+      "options": {
+        "buildDirectory": "build"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/cmake:test",
+      "options": {
+        "testDirectory": "build/tests"
+      }
+    }
+  }
+}

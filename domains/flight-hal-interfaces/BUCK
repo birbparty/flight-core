@@ -1,0 +1,179 @@
+# Root BUCK file for flight-hal-interfaces
+
+# Main HAL Core library
+cxx_library(
+    name = "hal-core",
+    srcs = glob([
+        "src/core/*.cpp",
+    ]),
+    headers = glob([
+        "include/flight/hal/core/*.hpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_CORE",
+    ],
+    header_namespace = "",
+    exported_headers = {
+        "flight/hal/core/driver_registry.hpp": "include/flight/hal/core/driver_registry.hpp",
+        "flight/hal/core/driver_registry_impl.hpp": "include/flight/hal/core/driver_registry_impl.hpp",
+        "flight/hal/core/driver_auto_registration.hpp": "include/flight/hal/core/driver_auto_registration.hpp",
+        "flight/hal/core/platform_detection.hpp": "include/flight/hal/core/platform_detection.hpp",
+        "flight/hal/core/platform_capabilities.hpp": "include/flight/hal/core/platform_capabilities.hpp",
+        "flight/hal/core/platform.hpp": "include/flight/hal/core/platform.hpp",
+        "flight/hal/core/hal_capabilities.hpp": "include/flight/hal/core/hal_capabilities.hpp",
+        "flight/hal/core/hal_error.hpp": "include/flight/hal/core/hal_error.hpp",
+        "flight/hal/core/hal_result.hpp": "include/flight/hal/core/hal_result.hpp",
+        "flight/hal/core/hal_error_macros.hpp": "include/flight/hal/core/hal_error_macros.hpp",
+        "flight/hal/core/hal_logging.hpp": "include/flight/hal/core/hal_logging.hpp",
+    },
+    visibility = ["PUBLIC"],
+)
+
+# HAL Interfaces library
+cxx_library(
+    name = "hal-interfaces",
+    headers = glob([
+        "include/flight/hal/interfaces/*.hpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_INTERFACES",
+    ],
+    header_namespace = "",
+    exported_headers = {
+        "flight/hal/interfaces/memory.hpp": "include/flight/hal/interfaces/memory.hpp",
+    },
+    deps = [
+        ":hal-core",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+# HAL Coordination library
+cxx_library(
+    name = "hal-coordination",
+    srcs = glob([
+        "src/coordination/*.cpp",
+    ]),
+    headers = glob([
+        "include/flight/hal/coordination/*.hpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_COORDINATION",
+    ],
+    header_namespace = "",
+    exported_headers = {
+        "flight/hal/coordination/resource_handle.hpp": "include/flight/hal/coordination/resource_handle.hpp",
+        "flight/hal/coordination/cross_driver_messenger.hpp": "include/flight/hal/coordination/cross_driver_messenger.hpp",
+        "flight/hal/coordination/deadlock_prevention.hpp": "include/flight/hal/coordination/deadlock_prevention.hpp",
+    },
+    deps = [
+        ":hal-core",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+# HAL Platform library
+cxx_library(
+    name = "hal-platform",
+    srcs = glob([
+        "src/platform/*.cpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_PLATFORM",
+    ],
+    deps = [
+        ":hal-core",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+# HAL Validation library
+cxx_library(
+    name = "hal-validation",
+    srcs = glob([
+        "src/validation/*.cpp",
+    ]),
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = [
+        "-DFLIGHT_HAL_VALIDATION",
+    ],
+    deps = [
+        ":hal-core",
+        ":hal-interfaces",
+        ":hal-coordination",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+# Combined main library (equivalent to CMake's flight-hal-interfaces)
+cxx_library(
+    name = "flight-hal-interfaces",
+    deps = [
+        ":hal-core",
+        ":hal-interfaces",
+        ":hal-coordination",
+        ":hal-platform",
+        ":hal-validation",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+# Example executables
+cxx_binary(
+    name = "enhanced-hal-example",
+    srcs = [
+        "examples/basic_hal_usage/enhanced_hal_example.cpp",
+    ],
+    compiler_flags = ["-std=c++17"],
+    deps = [
+        ":flight-hal-interfaces",
+    ],
+)
+
+cxx_binary(
+    name = "advanced-registration-example",
+    srcs = [
+        "examples/driver_registration/advanced_registration_example.cpp",
+    ],
+    compiler_flags = ["-std=c++17"],
+    deps = [
+        ":flight-hal-interfaces",
+    ],
+)
+
+cxx_binary(
+    name = "platform-detection-example",
+    srcs = [
+        "examples/platform_detection/platform_detection_example.cpp",
+    ],
+    compiler_flags = ["-std=c++17"],
+    deps = [
+        ":flight-hal-interfaces",
+    ],
+)
+
+cxx_binary(
+    name = "error-handling-example",
+    srcs = [
+        "examples/error_handling/error_handling_example.cpp",
+    ],
+    compiler_flags = ["-std=c++17"],
+    deps = [
+        ":flight-hal-interfaces",
+    ],
+)
+
+cxx_binary(
+    name = "gpu-audio-coordination-example",
+    srcs = [
+        "examples/resource_coordination/gpu_audio_coordination_example.cpp",
+    ],
+    compiler_flags = ["-std=c++17"],
+    deps = [
+        ":flight-hal-interfaces",
+    ],
+)

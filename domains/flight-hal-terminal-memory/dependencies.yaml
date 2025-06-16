@@ -1,0 +1,14 @@
+team_info:
+  name: "Terminal Memory Team"
+  purpose: "Implement memory management for terminal platform"
+  
+dependencies:
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocator interface"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Platform detection"
+      - "Error types"

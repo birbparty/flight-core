@@ -1,0 +1,19 @@
+{
+  "name": "flight-hal-test-memory",
+  "projectType": "library",
+  "sourceRoot": "teams/flight-hal-test-memory//src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/cmake:build",
+      "options": {
+        "buildDirectory": "build"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/cmake:test",
+      "options": {
+        "testDirectory": "build/tests"
+      }
+    }
+  }
+}

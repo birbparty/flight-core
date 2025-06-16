@@ -1,0 +1,33 @@
+[package]
+name = "flight_component_validation"
+version = "1.0.0"
+edition = "2021"
+description = "Component Model infrastructure validation for Flight-Core and V6R"
+authors = ["Flight-Core Team"]
+license = "MIT"
+
+[lib]
+name = "flight_component_validation"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wit-bindgen-rust = "0.13.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+flight-memory-validation = { path = "../memory" }
+flight-error-validation = { path = "../error" }
+flight-platform-validation = { path = "../platform" }
+flight-session-validation = { path = "../session" }
+
+[features]
+default = []
+v6r-extensions = []
+flight = []
+
+[package.metadata.component]
+adapter = "wasi_snapshot_preview1"
+
+[[bin]]
+name = "component-validation"
+path = "src/bin/validation.rs"

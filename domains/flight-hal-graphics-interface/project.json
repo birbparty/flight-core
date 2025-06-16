@@ -1,0 +1,19 @@
+{
+  "name": "flight-hal-graphics-interface",
+  "projectType": "library",
+  "sourceRoot": "teams/flight-hal-graphics-interface//src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/cmake:build",
+      "options": {
+        "buildDirectory": "build"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/cmake:test",
+      "options": {
+        "testDirectory": "build/tests"
+      }
+    }
+  }
+}

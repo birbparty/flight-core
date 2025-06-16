@@ -1,0 +1,50 @@
+// Common Memory Constants - Universal values and utilities
+package flight:memory@0.1.0;
+
+interface common {
+  // Common alignment boundaries
+  const ALIGN-4: u32 = 4;          // 32-bit alignment
+  const ALIGN-8: u32 = 8;          // 64-bit alignment  
+  const ALIGN-16: u32 = 16;        // SIMD alignment
+  const ALIGN-32: u32 = 32;        // AVX alignment
+  const ALIGN-64: u32 = 64;        // Cache line (typical)
+  const ALIGN-128: u32 = 128;      // Cache line (some platforms)
+  const ALIGN-4096: u32 = 4096;    // Page alignment
+  
+  // Memory size units
+  const BYTE: u64 = 1;
+  const KILOBYTE: u64 = 1024;
+  const MEGABYTE: u64 = 1048576;
+  const GIGABYTE: u64 = 1073741824;
+  const TERABYTE: u64 = 1099511627776;
+  
+  // Common page sizes
+  const PAGE-4K: u32 = 4096;       // Standard page
+  const PAGE-16K: u32 = 16384;     // iOS page size
+  const PAGE-64K: u32 = 65536;     // WASM page size
+  const PAGE-2M: u32 = 2097152;    // Huge page
+  const PAGE-1G: u32 = 1073741824; // Gigantic page
+  
+  // Memory pool sizes (for retro-graph pixel buffers)
+  const POOL-TINY: u64 = 65536;        // 64KB - small buffers
+  const POOL-SMALL: u64 = 262144;      // 256KB - UI elements
+  const POOL-MEDIUM: u64 = 1048576;    // 1MB - graphs
+  const POOL-LARGE: u64 = 4194304;     // 4MB - full screens
+  const POOL-HUGE: u64 = 16777216;     // 16MB - multi-display
+  
+  // Cache sizes (typical)
+  const L1-CACHE-SIZE: u32 = 32768;    // 32KB typical L1
+  const L2-CACHE-SIZE: u32 = 262144;   // 256KB typical L2
+  const L3-CACHE-SIZE: u32 = 8388608;  // 8MB typical L3
+  
+  // Stack sizes
+  const STACK-MINIMAL: u64 = 65536;    // 64KB - embedded
+  const STACK-SMALL: u64 = 1048576;    // 1MB - typical
+  const STACK-LARGE: u64 = 8388608;    // 8MB - heavy recursion
+  
+  // Fragmentation thresholds
+  const FRAG-EXCELLENT: float32 = 0.05;  // < 5% fragmentation
+  const FRAG-GOOD: float32 = 0.15;      // < 15% fragmentation
+  const FRAG-ACCEPTABLE: float32 = 0.30; // < 30% fragmentation
+  const FRAG-POOR: float32 = 0.50;      // > 50% fragmentation
+}

@@ -1,0 +1,15 @@
+team_info:
+  name: "macOS Memory Team"
+  purpose: "Implement macOS memory management with mmap and virtual memory"
+  
+dependencies:
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocator interface"
+      - "Virtual memory support"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "macOS platform detection"
+      - "Error types"

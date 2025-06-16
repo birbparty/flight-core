@@ -1,0 +1,466 @@
+package flight:pagination@1.0.0;
+
+/// Pagination and list operation types for Flight-Core and V6R
+interface pagination-types {
+    use flight:error/error-types.{flight-result, flight-error};
+    use flight:memory/memory-types.{memory-size};
+    
+    /// Pagination parameters
+    record pagination {
+        /// Current page number (1-based)
+        page: u32,
+        /// Items per page
+        per-page: u32,
+        /// Total number of items
+        total: u64,
+        /// Total number of pages
+        total-pages: u32,
+        /// Whether there are more pages after current
+        has-next: bool,
+        /// Whether there are pages before current
+        has-previous: bool,
+        /// Optional cursor for cursor-based pagination
+        cursor: option<string>,
+        /// Next page cursor
+        next-cursor: option<string>,
+        /// Previous page cursor
+        prev-cursor: option<string>,
+    }
+    
+    /// List request parameters
+    record list-request {
+        /// Page number (1-based, optional)
+        page: option<u32>,
+        /// Items per page (optional, uses default)
+        per-page: option<u32>,
+        /// Sort field
+        sort-by: option<string>,
+        /// Sort direction
+        sort-order: option<sort-order>,
+        /// Search query string
+        search: option<string>,
+        /// List filters
+        filters: list<list-filter>,
+        /// Cursor for cursor-based pagination
+        cursor: option<string>,
+        /// Include total count (expensive for large datasets)
+        include-total: option<bool>,
+        /// Memory constraints for constrained platforms
+        memory-limit: option<memory-size>,
+    }
+    
+    /// Sort order options
+    enum sort-order {
+        /// Ascending order (A-Z, 0-9, oldest first)
+        asc,
+        /// Descending order (Z-A, 9-0, newest first)
+        desc,
+    }
+    
+    /// List filter definition
+    record list-filter {
+        /// Field to filter on
+        field: string,
+        /// Filter operation
+        operation: filter-operation,
+        /// Filter value(s)
+        values: list<string>,
+        /// Whether filter is case-sensitive
+        case-sensitive: option<bool>,
+    }
+    
+    /// Filter operations
+    enum filter-operation {
+        /// Exact match (field == value)
+        equals,
+        /// Not equal (field != value)
+        not-equals,
+        /// Contains substring (field contains value)
+        contains,
+        /// Does not contain substring
+        not-contains,
+        /// Starts with prefix
+        starts-with,
+        /// Ends with suffix
+        ends-with,
+        /// In list of values
+        in-list,
+        /// Not in list of values
+        not-in-list,
+        /// Greater than (for numbers/dates)
+        greater-than,
+        /// Greater than or equal
+        greater-than-or-equal,
+        /// Less than (for numbers/dates)
+        less-than,
+        /// Less than or equal
+        less-than-or-equal,
+        /// Between two values (inclusive)
+        between,
+        /// Regular expression match
+        regex,
+        /// Is null/empty
+        is-null,
+        /// Is not null/empty
+        is-not-null,
+        /// Memory usage above threshold
+        memory-above,
+        /// Memory usage below threshold
+        memory-below,
+        /// Date range filter
+        date-range,
+    }
+    
+    /// List response wrapper
+    record list-response<T> {
+        /// List items
+        items: list<T>,
+        /// Pagination information
+        pagination: pagination,
+        /// Response metadata
+        metadata: list<tuple<string, string>>,
+        /// Response generation time
+        generated-at: u64,
+        /// Cache information
+        cache-info: option<cache-info>,
+    }
+    
+    /// Cache information for list responses
+    record cache-info {
+        /// Whether response was served from cache
+        from-cache: bool,
+        /// Cache expiration time
+        expires-at: u64,
+        /// Cache key identifier
+        cache-key: option<string>,
+        /// Cache hit rate for this query pattern
+        hit-rate: option<f32>,
+    }
+    
+    /// Search parameters for full-text search
+    record search-params {
+        /// Search query string
+        query: string,
+        /// Fields to search in
+        fields: option<list<string>>,
+        /// Search mode
+        mode: search-mode,
+        /// Fuzzy search tolerance (0.0 = exact, 1.0 = very fuzzy)
+        fuzzy-tolerance: option<f32>,
+        /// Minimum word length for indexing
+        min-word-length: option<u32>,
+        /// Language for text processing
+        language: option<string>,
+        /// Highlight search terms in results
+        highlight: option<bool>,
+    }
+    
+    /// Search modes
+    enum search-mode {
+        /// Simple substring search
+        simple,
+        /// Full-text search with ranking
+        full-text,
+        /// Fuzzy search with approximate matching
+        fuzzy,
+        /// Regular expression search
+        regex,
+        /// Exact phrase search
+        phrase,
+        /// Boolean search with AND/OR/NOT
+        boolean,
+    }
+    
+    /// Search results with ranking
+    record search-result<T> {
+        /// Result item
+        item: T,
+        /// Search relevance score (0.0 to 1.0)
+        score: f32,
+        /// Highlighted text snippets
+        highlights: list<string>,
+        /// Field matches
+        field-matches: list<field-match>,
+    }
+    
+    /// Field match information
+    record field-match {
+        /// Field name that matched
+        field: string,
+        /// Matched text
+        text: string,
+        /// Match position in field
+        position: u32,
+        /// Match length
+        length: u32,
+    }
+    
+    /// Aggregation parameters for analytics
+    record aggregation-request {
+        /// Field to aggregate on
+        field: string,
+        /// Aggregation type
+        aggregation-type: aggregation-type,
+        /// Number of top results to return
+        limit: option<u32>,
+        /// Filters to apply before aggregation
+        filters: list<list-filter>,
+    }
+    
+    /// Aggregation types
+    enum aggregation-type {
+        /// Count of items per unique value
+        count,
+        /// Sum of numeric values
+        sum,
+        /// Average of numeric values
+        avg,
+        /// Minimum value
+        min,
+        /// Maximum value
+        max,
+        /// Unique value count
+        distinct-count,
+        /// Memory usage statistics
+        memory-stats,
+        /// Date histogram
+        date-histogram,
+    }
+    
+    /// Aggregation result
+    record aggregation-result {
+        /// Aggregated field
+        field: string,
+        /// Aggregation type used
+        aggregation-type: aggregation-type,
+        /// Result buckets
+        buckets: list<aggregation-bucket>,
+        /// Total items aggregated
+        total-items: u64,
+    }
+    
+    /// Aggregation bucket
+    record aggregation-bucket {
+        /// Bucket key (value being aggregated)
+        key: string,
+        /// Bucket value (count, sum, etc.)
+        value: f64,
+        /// Number of items in bucket
+        doc-count: u64,
+    }
+    
+    /// Platform-specific list constraints
+    record platform-constraints {
+        /// Maximum items per page
+        max-per-page: u32,
+        /// Maximum total pages
+        max-pages: option<u32>,
+        /// Memory limit for list operations
+        memory-limit: memory-size,
+        /// Supported search modes
+        supported-search-modes: list<search-mode>,
+        /// Supported filter operations
+        supported-filters: list<filter-operation>,
+        /// Cache enabled
+        cache-enabled: bool,
+        /// Real-time updates supported
+        realtime-updates: bool,
+    }
+    
+    /// Flight-Core specific list types
+    record flight-list-context {
+        /// Platform context
+        platform: string,
+        /// Session context
+        session-id: option<string>,
+        /// Component context
+        component-id: option<string>,
+        /// HAL subsystem context
+        hal-subsystem: option<string>,
+        /// Memory pool context
+        memory-pool: option<string>,
+    }
+    
+    /// V6R specific list types
+    record v6r-list-context {
+        /// User context
+        user-id: string,
+        /// Organization context
+        organization-id: option<string>,
+        /// Team context
+        team-id: option<string>,
+        /// Subscription tier
+        subscription-tier: string,
+        /// VM context
+        vm-id: option<string>,
+        /// Project context
+        project-id: option<string>,
+    }
+    
+    /// List operation metrics
+    record list-metrics {
+        /// Query execution time (ms)
+        query-time-ms: f32,
+        /// Total execution time (ms)
+        total-time-ms: f32,
+        /// Number of items processed
+        items-processed: u64,
+        /// Number of items returned
+        items-returned: u32,
+        /// Memory used for operation
+        memory-used: memory-size,
+        /// Cache hit/miss
+        cache-hit: bool,
+        /// Index usage information
+        index-used: option<string>,
+        /// Performance warnings
+        warnings: list<string>,
+    }
+    
+    /// Bulk operation request
+    record bulk-operation-request<T> {
+        /// Operation type
+        operation: bulk-operation-type,
+        /// Items to operate on
+        items: list<T>,
+        /// Filters for selecting items
+        filters: list<list-filter>,
+        /// Operation parameters
+        parameters: list<tuple<string, string>>,
+        /// Batch size for processing
+        batch-size: option<u32>,
+        /// Parallel processing enabled
+        parallel: option<bool>,
+    }
+    
+    /// Bulk operation types
+    enum bulk-operation-type {
+        /// Create multiple items
+        create,
+        /// Update multiple items
+        update,
+        /// Delete multiple items
+        delete,
+        /// Move/transfer multiple items
+        move,
+        /// Copy multiple items
+        copy,
+        /// Export multiple items
+        export,
+        /// Archive multiple items
+        archive,
+    }
+    
+    /// Bulk operation result
+    record bulk-operation-result {
+        /// Operation type performed
+        operation: bulk-operation-type,
+        /// Number of items processed
+        processed: u32,
+        /// Number of successful operations
+        succeeded: u32,
+        /// Number of failed operations
+        failed: u32,
+        /// Detailed results per item
+        item-results: list<bulk-item-result>,
+        /// Operation metrics
+        metrics: list-metrics,
+        /// Any warnings or errors
+        errors: list<string>,
+    }
+    
+    /// Individual item result in bulk operation
+    record bulk-item-result {
+        /// Item identifier
+        item-id: string,
+        /// Operation success
+        success: bool,
+        /// Error message if failed
+        error: option<string>,
+        /// Updated item data
+        updated-item: option<string>, // JSON representation
+    }
+}
+
+/// List management interface
+interface list-management {
+    use pagination-types.{list-request, list-response, pagination, search-params,
+                           search-result, aggregation-request, aggregation-result,
+                           platform-constraints, list-metrics, flight-result};
+    
+    /// Get paginated list with filters
+    list-items: func<T>(
+        request: list-request,
+        context: option<string> // JSON context (flight-list-context or v6r-list-context)
+    ) -> flight-result<list-response<T>>;
+    
+    /// Search items with full-text search
+    search-items: func<T>(
+        search: search-params,
+        request: list-request,
+        context: option<string>
+    ) -> flight-result<list-response<search-result<T>>>;
+    
+    /// Get aggregated data
+    aggregate-items: func(
+        aggregation: aggregation-request,
+        context: option<string>
+    ) -> flight-result<aggregation-result>;
+    
+    /// Get platform constraints for list operations
+    get-platform-constraints: func(
+        platform: string
+    ) -> flight-result<platform-constraints>;
+    
+    /// Get list operation metrics
+    get-list-metrics: func(
+        operation-id: string
+    ) -> flight-result<list-metrics>;
+    
+    /// Cache list results for performance
+    cache-list-result: func<T>(
+        cache-key: string,
+        result: list-response<T>,
+        ttl-seconds: u32
+    ) -> flight-result<bool>;
+    
+    /// Get cached list result
+    get-cached-result: func<T>(
+        cache-key: string
+    ) -> flight-result<option<list-response<T>>>;
+}
+
+/// Bulk operations interface
+interface bulk-operations {
+    use pagination-types.{bulk-operation-request, bulk-operation-result,
+                           list-filter, flight-result};
+    
+    /// Perform bulk operation on multiple items
+    bulk-operation: func<T>(
+        request: bulk-operation-request<T>,
+        context: option<string>
+    ) -> flight-result<bulk-operation-result>;
+    
+    /// Get bulk operation status
+    get-bulk-operation-status: func(
+        operation-id: string
+    ) -> flight-result<bulk-operation-result>;
+    
+    /// Cancel running bulk operation
+    cancel-bulk-operation: func(
+        operation-id: string
+    ) -> flight-result<bool>;
+    
+    /// Get bulk operation history
+    list-bulk-operations: func(
+        request: list-request,
+        context: option<string>
+    ) -> flight-result<list-response<bulk-operation-result>>;
+}
+
+/// Flight Pagination World - Component Model entry point
+world flight-pagination {
+    export pagination-types;
+    export list-management;
+    export bulk-operations;
+}

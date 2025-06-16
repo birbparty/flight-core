@@ -1,0 +1,15 @@
+team_info:
+  name: "Web Memory Team"
+  purpose: "Implement WebAssembly memory management"
+  
+dependencies:
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory allocator interface"
+      - "Linear memory abstraction"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Emscripten platform detection"
+      - "Error types"

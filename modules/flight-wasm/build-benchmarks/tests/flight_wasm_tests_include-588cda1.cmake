@@ -1,0 +1,5 @@
+if(EXISTS "/Users/punk1290/git/flight/modules/flight-wasm/build-benchmarks/tests/flight_wasm_tests_tests-588cda1.cmake")
+  include("/Users/punk1290/git/flight/modules/flight-wasm/build-benchmarks/tests/flight_wasm_tests_tests-588cda1.cmake")
+else()
+  add_test(flight_wasm_tests_NOT_BUILT-588cda1 flight_wasm_tests_NOT_BUILT-588cda1)
+endif()

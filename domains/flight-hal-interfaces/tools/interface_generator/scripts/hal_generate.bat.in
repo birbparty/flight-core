@@ -1,0 +1,17 @@
+@echo off
+REM Flight HAL Code Generator Convenience Script
+REM This script provides easy access to the HAL code generator
+
+set GENERATOR=@CMAKE_INSTALL_PREFIX@\@CMAKE_INSTALL_BINDIR@\hal_generator.exe
+set TEMPLATES_DIR=@CMAKE_INSTALL_PREFIX@\@CMAKE_INSTALL_DATADIR@\flight_hal\templates
+set INTERFACES_DIR=@CMAKE_INSTALL_PREFIX@\include\flight\hal\interfaces
+
+REM Check if generator exists
+if not exist "%GENERATOR%" (
+    echo Error: HAL generator not found at %GENERATOR%
+    echo Please ensure Flight HAL is properly installed.
+    exit /b 1
+)
+
+REM Pass all arguments to the generator with template and interface directories
+"%GENERATOR%" --templates "%TEMPLATES_DIR%" --interfaces "%INTERFACES_DIR%" %*

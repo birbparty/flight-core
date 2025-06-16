@@ -1,0 +1,37 @@
+// Flight Memory Components - Main World Definition
+// This world imports and exports all memory-related interfaces
+package flight:memory@0.1.0;
+
+world memory-components {
+  // Core type definitions
+  import types/core;
+  import types/regions;
+  import types/capabilities;
+  import types/platforms;
+  
+  // Platform constants
+  import constants/platforms;
+  import constants/common;
+  
+  // Validation components
+  import validators/alignment;
+  import validators/bounds;
+  import validators/access;
+  
+  // Export aggregated functionality
+  export memory-toolkit: interface {
+    use types/core.{memory-size, memory-address, memory-alignment};
+    use types/regions.{memory-region};
+    use types/platforms.{platform-profile};
+    
+    // Convenience functions that combine multiple validators
+    validate-allocation: func(
+      size: memory-size,
+      alignment: memory-alignment,
+      region: memory-region
+    ) -> result<_, string>;
+    
+    // Get recommended allocation strategy for platform
+    get-allocation-strategy: func(platform: string) -> result<platform-profile, string>;
+  }
+}

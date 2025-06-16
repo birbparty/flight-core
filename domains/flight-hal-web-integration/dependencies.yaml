@@ -1,0 +1,14 @@
+team_info:
+  name: "web Platform Integration Team"
+  purpose: "Integrate all web subsystems into cohesive platform"
+  
+dependencies:
+  - project: "flight-hal-web-memory"
+    team: "web Memory Team"
+    features:
+      - "Complete memory management"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Platform interface"
+      - "Driver registry"

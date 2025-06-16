@@ -1,0 +1,321 @@
+package flight:memory@1.0.0;
+
+/// Core memory management types for Flight-Core and V6R integration
+/// 
+/// This interface provides the foundational memory types needed for:
+/// - V6R VM resource management and tracking
+/// - Flight-Core platform memory adaptation (16MB to 2GB+)
+/// - Cross-language type safety (TypeScript, Go, Rust, C++17)
+/// - Real-time memory monitoring and enforcement
+interface memory-types {
+    /// Memory size representation with human-readable formatting
+    /// 
+    /// Used throughout both ecosystems for consistent memory measurement
+    record memory-size {
+        /// Raw byte count - allows precise calculations
+        bytes: u64,
+        /// Human-readable format: "16MB", "512KB", "2GB", etc.
+        /// Critical for V6R UI components and logging
+        human-readable: string,
+    }
+    
+    /// Memory usage snapshot for real-time monitoring
+    /// 
+    /// V6R uses this for WebSocket memory updates and UI display
+    /// Flight-Core uses this for platform memory adaptation
+    record memory-usage-snapshot {
+        /// Timestamp when snapshot was taken (Unix timestamp)
+        timestamp: u64,
+        /// Session identifier (V6R session or Flight-Core component instance)
+        session-id: string,
+        /// Platform identifier for memory constraints
+        platform: string,
+        /// Total available memory for this context
+        total: memory-size,
+        /// Currently used memory
+        used: memory-size,
+        /// Available memory (calculated: total - used)
+        available: memory-size,
+        /// Memory fragmentation ratio (0.0-1.0)
+        /// Critical for Flight-Core constrained platforms
+        fragmentation-ratio: f32,
+    }
+    
+    /// Platform-specific memory profiles
+    /// 
+    /// Enables both Flight-Core and V6R to adapt behavior based on memory constraints
+    variant platform-profile {
+        /// Dreamcast: 16MB baseline (PlayStation 1 dropped for C++17)
+        dreamcast(memory-size),
+        /// PlayStation Portable: 32-64MB depending on model
+        psp(memory-size),
+        /// Sony PlayStation Vita: 512MB
+        vita(memory-size),
+        /// V6R Small VM: 512MB for lightweight development
+        v6r-small(memory-size),
+        /// V6R Medium VM: 1GB for standard development
+        v6r-medium(memory-size),
+        /// V6R Large VM: 2GB+ for intensive development
+        v6r-large(memory-size),
+        /// Custom platform with specified memory
+        custom(memory-size),
+    }
+    
+    /// Memory allocation tracking record
+    /// 
+    /// V6R uses this for VM resource accounting
+    /// Flight-Core uses this for component memory management
+    record memory-allocation {
+        /// Unique allocation identifier
+        id: string,
+        /// Session this allocation belongs to
+        session-id: string,
+        /// Size of the allocation
+        size: memory-size,
+        /// Purpose/category of this allocation
+        purpose: memory-purpose,
+        /// When allocation was created (Unix timestamp)
+        allocated-at: u64,
+        /// When allocation was freed (None if still active)
+        freed-at: option<u64>,
+    }
+    
+    /// Memory allocation purposes for categorization
+    /// 
+    /// Enables both systems to track memory usage by category
+    enum memory-purpose {
+        /// VM heap memory (V6R primary use case)
+        vm-heap,
+        /// Component stack memory (Flight-Core components)
+        component-stack,
+        /// Asset cache (textures, audio, etc.)
+        asset-cache,
+        /// JIT compiled code cache
+        jit-code-cache,
+        /// System reserved memory
+        system-reserved,
+        /// WebAssembly linear memory
+        wasm-linear,
+        /// Network buffers
+        network-buffers,
+        /// Temporary/scratch memory
+        temporary,
+    }
+    
+    /// Memory pressure levels for adaptive behavior
+    /// 
+    /// Flight-Core uses for platform adaptation
+    /// V6R uses for VM scaling decisions
+    enum memory-pressure {
+        /// Plenty of memory available
+        low,
+        /// Memory usage getting high but manageable
+        medium,
+        /// Memory critically low - aggressive cleanup needed
+        high,
+        /// Out of memory - emergency measures required
+        critical,
+    }
+    
+    /// Memory limits configuration
+    /// 
+    /// V6R uses for VM resource enforcement
+    /// Flight-Core uses for platform constraint adaptation
+    record memory-limits {
+        /// Maximum memory for VM/component heap
+        heap-max: memory-size,
+        /// Maximum memory for stack
+        stack-max: memory-size,
+        /// Maximum memory for caching
+        cache-max: memory-size,
+        /// Soft limit before warnings
+        soft-limit: memory-size,
+        /// Hard limit before allocation failures
+        hard-limit: memory-size,
+    }
+    
+    /// Memory-specific error types
+    /// 
+    /// Comprehensive error handling for memory operations
+    record memory-error {
+        /// Error code for programmatic handling
+        code: memory-error-code,
+        /// Human-readable error message
+        message: string,
+        /// Additional context/details
+        details: option<string>,
+        /// When error occurred
+        timestamp: u64,
+    }
+    
+    /// Memory error codes
+    enum memory-error-code {
+        /// Insufficient memory available
+        insufficient-memory,
+        /// Memory limit exceeded
+        limit-exceeded,
+        /// Invalid memory size requested
+        invalid-size,
+        /// Memory allocation failed
+        allocation-failed,
+        /// Memory already freed
+        already-freed,
+        /// Invalid allocation ID
+        invalid-allocation,
+        /// Platform not supported
+        unsupported-platform,
+        /// Memory fragmentation too high
+        fragmentation-error,
+    }
+}
+
+/// Memory management operations interface
+/// 
+/// Core functions for memory tracking and management
+interface memory-operations {
+    use memory-types.{memory-size, memory-allocation, memory-purpose, 
+                     memory-usage-snapshot, memory-error,
+                     memory-limits, memory-pressure, platform-profile};
+    
+    /// Create a new memory allocation record
+    /// 
+    /// V6R calls this when allocating VM memory
+    /// Flight-Core calls this for component memory tracking
+    create-allocation: func(
+        session-id: string,
+        size: memory-size,
+        purpose: memory-purpose
+    ) -> result<memory-allocation, memory-error>;
+    
+    /// Free a memory allocation
+    /// 
+    /// Marks allocation as freed and updates tracking
+    free-allocation: func(
+        allocation-id: string
+    ) -> result<bool, memory-error>;
+    
+    /// Get current memory usage snapshot
+    /// 
+    /// V6R uses for real-time UI updates and WebSocket streaming
+    /// Flight-Core uses for platform memory monitoring
+    get-memory-snapshot: func(
+        session-id: string
+    ) -> result<memory-usage-snapshot, memory-error>;
+    
+    /// Get platform memory profile
+    /// 
+    /// Returns memory constraints and capabilities for platform
+    get-platform-profile: func(
+        platform: string
+    ) -> result<platform-profile, memory-error>;
+    
+    /// Set memory limits for session
+    /// 
+    /// V6R uses for VM resource enforcement
+    /// Flight-Core uses for component constraint setting
+    set-memory-limits: func(
+        session-id: string,
+        limits: memory-limits
+    ) -> result<bool, memory-error>;
+    
+    /// Get memory limits for session
+    get-memory-limits: func(
+        session-id: string
+    ) -> result<memory-limits, memory-error>;
+    
+    /// Check current memory pressure level
+    /// 
+    /// Enables adaptive behavior based on memory availability
+    get-memory-pressure: func(
+        session-id: string
+    ) -> result<memory-pressure, memory-error>;
+    
+    /// Validate memory allocation request
+    /// 
+    /// Checks if allocation would succeed without actually allocating
+    /// Critical for V6R VM sizing decisions
+    validate-allocation-request: func(
+        session-id: string,
+        size: memory-size,
+        purpose: memory-purpose
+    ) -> result<bool, memory-error>;
+    
+    /// List all active allocations for session
+    /// 
+    /// V6R uses for memory usage breakdowns
+    /// Flight-Core uses for debugging and monitoring
+    list-allocations: func(
+        session-id: string
+    ) -> result<list<memory-allocation>, memory-error>;
+    
+}
+
+/// Memory statistics and analytics
+interface memory-analytics {
+    use memory-types.{memory-size, memory-purpose, memory-usage-snapshot, memory-error};
+    
+    /// Calculate memory statistics
+    /// 
+    /// Provides detailed memory usage analytics
+    calculate-memory-stats: func(
+        session-id: string
+    ) -> result<memory-stats, memory-error>;
+    
+    /// Comprehensive memory statistics
+    record memory-stats {
+        /// Total allocations made
+        total-allocations: u64,
+        /// Active allocations count
+        active-allocations: u64,
+        /// Peak memory usage recorded
+        peak-memory: memory-size,
+        /// Current memory usage
+        current-memory: memory-size,
+        /// Average allocation size
+        average-allocation-size: memory-size,
+        /// Memory usage by purpose
+        usage-by-purpose: list<tuple<memory-purpose, memory-size>>,
+        /// Memory efficiency ratio (0.0-1.0)
+        efficiency-ratio: f32,
+    }
+    
+    /// Memory usage trend data
+    record memory-trend {
+        /// Data points over time
+        snapshots: list<memory-usage-snapshot>,
+        /// Trend direction (increasing/decreasing/stable)
+        trend-direction: trend-direction,
+        /// Predicted future usage
+        predicted-peak: option<memory-size>,
+    }
+    
+    /// Trend direction enumeration
+    enum trend-direction {
+        increasing,
+        decreasing,
+        stable,
+        volatile,
+    }
+    
+    /// Get memory usage trends over time
+    /// 
+    /// V6R uses for capacity planning and scaling decisions
+    get-memory-trends: func(
+        session-id: string,
+        time-window: u64
+    ) -> result<memory-trend, memory-error>;
+    
+    /// Generate memory usage report
+    /// 
+    /// Comprehensive report for analysis and debugging
+    generate-memory-report: func(
+        session-id: string
+    ) -> result<string, memory-error>;
+}
+
+/// Flight Memory World - Component Model entry point
+world flight-memory {
+    export memory-types;
+    export memory-operations;
+    export memory-analytics;
+}

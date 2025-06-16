@@ -1,0 +1,154 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 15,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Development Build",
+      "description": "Default configuration for host platform development",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "FLIGHT_WASM_BUILD_TESTS": "ON",
+        "FLIGHT_WASM_ENABLE_WARNINGS": "ON",
+        "FLIGHT_WASM_WARNINGS_AS_ERRORS": "OFF"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release Build",
+      "description": "Optimized release build for host platform",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "FLIGHT_WASM_BUILD_TESTS": "ON",
+        "FLIGHT_WASM_ENABLE_WARNINGS": "ON",
+        "FLIGHT_WASM_WARNINGS_AS_ERRORS": "ON"
+      }
+    },
+    {
+      "name": "emscripten",
+      "displayName": "Emscripten WebAssembly",
+      "description": "Cross-compilation for WebAssembly using Emscripten",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/emscripten",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/Emscripten.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "FLIGHT_WASM_BUILD_TESTS": "OFF",
+        "FLIGHT_WASM_EMBEDDED_OPTIMIZE_SIZE": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_EXCEPTIONS": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_RTTI": "ON"
+      }
+    },
+    {
+      "name": "emscripten-debug",
+      "displayName": "Emscripten WebAssembly Debug",
+      "description": "Debug build for WebAssembly with source maps",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/emscripten-debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/Emscripten.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "FLIGHT_WASM_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "dreamcast",
+      "displayName": "Dreamcast SH-4",
+      "description": "Cross-compilation for Dreamcast using KallistiOS",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/dreamcast",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/Dreamcast.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel",
+        "FLIGHT_WASM_BUILD_TESTS": "OFF",
+        "FLIGHT_WASM_EMBEDDED_OPTIMIZE_SIZE": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_EXCEPTIONS": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_RTTI": "ON"
+      }
+    },
+    {
+      "name": "psp",
+      "displayName": "PlayStation Portable",
+      "description": "Cross-compilation for PSP using PSPSDK",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/psp",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/PSP.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel",
+        "FLIGHT_WASM_BUILD_TESTS": "OFF",
+        "FLIGHT_WASM_EMBEDDED_OPTIMIZE_SIZE": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_EXCEPTIONS": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_RTTI": "ON"
+      }
+    },
+    {
+      "name": "psvita",
+      "displayName": "PlayStation Vita",
+      "description": "Cross-compilation for PS Vita using VitaSDK",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/psvita",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/PSVita.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "FLIGHT_WASM_BUILD_TESTS": "OFF",
+        "FLIGHT_WASM_EMBEDDED_OPTIMIZE_SIZE": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_EXCEPTIONS": "ON",
+        "FLIGHT_WASM_EMBEDDED_NO_RTTI": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "displayName": "Build Default"
+    },
+    {
+      "name": "release", 
+      "configurePreset": "release",
+      "displayName": "Build Release"
+    },
+    {
+      "name": "emscripten",
+      "configurePreset": "emscripten", 
+      "displayName": "Build WebAssembly"
+    },
+    {
+      "name": "dreamcast",
+      "configurePreset": "dreamcast",
+      "displayName": "Build Dreamcast"
+    },
+    {
+      "name": "psp",
+      "configurePreset": "psp",
+      "displayName": "Build PSP"
+    },
+    {
+      "name": "psvita",
+      "configurePreset": "psvita", 
+      "displayName": "Build PS Vita"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "displayName": "Test Default"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release", 
+      "displayName": "Test Release"
+    }
+  ]
+}

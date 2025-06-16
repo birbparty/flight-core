@@ -1,0 +1,122 @@
+team_info:
+  name: "Flight Debug Instrumentation Team"
+  purpose: "Create debug/release instrumentation system for flattened modules"
+  critical_path: false
+  
+dependencies:
+  - project: "flight-component-flattener"
+    team: "Flight Component Flattener Team"
+    features_needed:
+      - "Component metadata preservation"
+      - "Function mapping tables"
+      - "Debug symbol generation"
+    blocker: true
+    why: "Need component info to instrument correctly"
+    
+  - project: "flight-simple-runtime"
+    team: "Flight Simple Runtime Team"
+    features_needed:
+      - "Debug hook integration points"
+      - "Runtime callback registration"
+      - "Performance counter access"
+    blocker: false
+    why: "Need runtime integration for debugging"
+    
+  - project: "flight-build-pipeline"
+    team: "Flight Build Pipeline Team"
+    features_needed:
+      - "Debug/release build flags"
+      - "Symbol file generation"
+      - "Build configuration API"
+    blocker: false
+    why: "Need to integrate into build process"
+
+what_we_provide:
+  - feature: "Debug instrumentation"
+    consumers:
+      - "Developers"
+      - "QA teams"
+    format: "Instrumented WASM modules"
+    
+  - feature: "Debug symbols"
+    consumers:
+      - "IDEs"
+      - "Debuggers"
+    format: "Source maps, DWARF, custom formats"
+    
+  - feature: "Runtime debug API"
+    consumers:
+      - "Flight Simple Runtime Team"
+      - "Developer tools"
+    format: "C++ debug interface"
+    
+  - feature: "Performance profiling"
+    consumers:
+      - "Performance teams"
+      - "Developers"
+    format: "Profile data and visualization"
+
+blocks:
+  - team: "Developers"
+    why: "They need debugging capabilities"
+    impact: "Cannot efficiently debug games"
+    
+  - team: "QA teams"
+    why: "They need detailed bug reports"
+    impact: "Cannot provide actionable feedback"
+
+deliverables:
+  phase_1:
+    - "Basic function tracing"
+    - "Debug/release mode switching"
+    - "Simple debug output"
+    
+  phase_2:
+    - "Component-aware debugging"
+    - "Memory access tracking"
+    - "Source mapping"
+    
+  phase_3:
+    - "Full debugger integration"
+    - "Performance profiling"
+    - "Remote debugging"
+
+external_dependencies:
+  - name: "Binaryen"
+    version: "latest"
+    purpose: "WASM instrumentation"
+    license: "Apache-2.0"
+    
+  - name: "LLVM DWARF"
+    version: "14+"
+    purpose: "Debug format support"
+    license: "Apache-2.0"
+    
+  - name: "Source Map"
+    version: "0.7+"
+    purpose: "JavaScript source mapping"
+    license: "BSD-3-Clause"
+
+technical_requirements:
+  language: "C++17"
+  build_system: "CMake 3.14+"
+  
+  constraints:
+    - "Zero overhead in release"
+    - "< 10% overhead in debug"
+    - "Works with all platforms"
+    - "No heap allocation in release"
+  
+debug_features:
+  - "Function call tracing"
+  - "Memory access logging"
+  - "Component boundary tracking"
+  - "Performance timing"
+  - "Stack trace generation"
+
+release_guarantees:
+  - "All debug code eliminated"
+  - "No binary size increase"
+  - "No runtime checks"
+  - "Identical performance"
+  - "No debug symbols"

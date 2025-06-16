@@ -1,0 +1,483 @@
+package flight:error@1.0.0;
+
+/// Universal error handling types for Flight-Core and external service integration
+/// 
+/// Provides exception-free error management across platforms from
+/// Dreamcast (16MB) to modern cloud environments with full type safety
+interface error-types {
+    /// Core error severity levels
+    /// 
+    /// Used for error prioritization and handling strategies across all integrating services
+    enum error-severity {
+        /// Informational - no action required
+        info,
+        /// Warning - attention recommended
+        warning,
+        /// Error - action required but system continues
+        error,
+        /// Critical - immediate action required
+        critical,
+        /// Fatal - system cannot continue
+        fatal,
+    }
+    
+    /// Error categories for systematic error handling
+    /// 
+    /// Generic categories that any service can map their errors to
+    enum error-category {
+        /// Memory-related errors
+        memory,
+        /// Platform-specific errors
+        platform,
+        /// Network and I/O errors
+        network,
+        /// Validation and input errors
+        validation,
+        /// Authentication and authorization
+        security,
+        /// Component Model errors
+        component,
+        /// External service integration errors
+        service-integration,
+        /// Flight-Core system errors
+        flight-system,
+        /// Application-level errors
+        application,
+        /// Unknown/uncategorized errors
+        unknown,
+    }
+    
+    /// Structured error context for debugging and service integration
+    /// 
+    /// Provides comprehensive context without performance impact
+    record error-context {
+        /// Component or service that generated the error
+        source: string,
+        /// Specific operation that failed
+        operation: string,
+        /// Session or request identifier
+        session-id: option<string>,
+        /// User identifier (for authenticated contexts)
+        user-id: option<string>,
+        /// Platform identifier
+        platform: option<string>,
+        /// Service-specific identifier (for external integrations)
+        service-id: option<string>,
+        /// Additional key-value context pairs for extensibility
+        metadata: list<tuple<string, string>>,
+    }
+    
+    /// Core error type with rich context
+    /// 
+    /// Universal error structure for all Flight systems and integrating services
+    record flight-error {
+        /// Unique error identifier
+        id: string,
+        /// Error severity level
+        severity: error-severity,
+        /// Error category for handling
+        category: error-category,
+        /// Human-readable error message
+        message: string,
+        /// Technical details for debugging
+        details: option<string>,
+        /// Rich context information
+        context: error-context,
+        /// When the error occurred (Unix timestamp)
+        timestamp: u64,
+        /// Optional nested/causative error ID
+        cause: option<string>,
+    }
+    
+    /// Result type for exception-free error handling
+    /// 
+    /// Used throughout Flight systems for robust error management
+    variant flight-result<T> {
+        /// Operation succeeded with value
+        ok(T),
+        /// Operation failed with error
+        err(flight-error),
+    }
+    
+    /// Error collection for batch operations
+    /// 
+    /// Handles multiple errors from complex operations
+    record error-collection {
+        /// All errors that occurred
+        errors: list<flight-error>,
+        /// Count of errors by severity
+        severity-counts: list<tuple<error-severity, u32>>,
+        /// Count of errors by category
+        category-counts: list<tuple<error-category, u32>>,
+        /// Whether any critical/fatal errors exist
+        has-blocking-errors: bool,
+        /// Total error count
+        total-count: u32,
+    }
+    
+    /// Generic service error codes for external integrations
+    /// 
+    /// Common error patterns that external services can map to
+    enum service-error-code {
+        /// Resource allocation failed
+        resource-allocation-failed,
+        /// Session/connection limit exceeded
+        session-limit-exceeded,
+        /// Authentication failed
+        auth-failed,
+        /// API rate limit exceeded
+        rate-limit-exceeded,
+        /// Service temporarily unavailable
+        service-unavailable,
+        /// Invalid configuration
+        invalid-config,
+        /// Resource limit exceeded (memory, storage, etc.)
+        resource-limit-exceeded,
+        /// Connection/communication failed
+        connection-failed,
+        /// Request timeout
+        request-timeout,
+        /// Invalid request format
+        invalid-request,
+        /// Permission denied
+        permission-denied,
+        /// Resource not found
+        resource-not-found,
+    }
+    
+    /// Platform-specific error types
+    /// 
+    /// Errors specific to Flight-Core platforms
+    enum platform-error-code {
+        /// Insufficient platform memory
+        insufficient-platform-memory,
+        /// Platform feature not supported
+        feature-not-supported,
+        /// Hardware constraint violation
+        hardware-constraint-violation,
+        /// Platform initialization failed
+        platform-init-failed,
+        /// Component loading failed
+        component-load-failed,
+        /// Cross-platform compatibility issue
+        compatibility-error,
+        /// Platform resource exhausted
+        platform-resource-exhausted,
+    }
+    
+    /// Network error types
+    /// 
+    /// Comprehensive network error handling
+    enum network-error-code {
+        /// Connection timeout
+        connection-timeout,
+        /// Connection refused
+        connection-refused,
+        /// DNS resolution failed
+        dns-resolution-failed,
+        /// TLS/SSL error
+        tls-error,
+        /// HTTP error response
+        http-error,
+        /// WebSocket error
+        websocket-error,
+        /// Request timeout
+        request-timeout,
+        /// Network unreachable
+        network-unreachable,
+        /// Protocol error
+        protocol-error,
+        /// Bandwidth limit exceeded
+        bandwidth-limit-exceeded,
+    }
+    
+    /// Validation error details
+    /// 
+    /// Structured validation error information
+    record validation-error-details {
+        /// Field that failed validation
+        field: string,
+        /// Validation rule that was violated
+        rule: string,
+        /// Expected value or format
+        expected: string,
+        /// Actual value received
+        actual: string,
+        /// Additional validation context
+        context: option<string>,
+    }
+    
+    /// Error recovery suggestion
+    /// 
+    /// Actionable suggestions for error resolution
+    record error-recovery-suggestion {
+        /// Type of recovery action
+        action-type: recovery-action-type,
+        /// Human-readable suggestion
+        description: string,
+        /// Whether this action can be automated
+        can-automate: bool,
+        /// Priority of this suggestion (higher = more important)
+        priority: u32,
+    }
+    
+    /// Recovery action types
+    enum recovery-action-type {
+        /// Retry the operation
+        retry,
+        /// Reduce resource usage
+        reduce-resources,
+        /// Update configuration
+        update-config,
+        /// Contact support
+        contact-support,
+        /// Try alternative approach
+        try-alternative,
+        /// Wait and retry later
+        wait-retry,
+        /// Upgrade service plan/resources
+        upgrade-resources,
+        /// Check system status
+        check-status,
+    }
+}
+
+/// Error handling operations interface
+/// 
+/// Core functions for error creation and management
+interface error-operations {
+    use error-types.{flight-error, flight-result, error-context, 
+                    error-severity, error-category, error-collection,
+                    service-error-code, platform-error-code, network-error-code,
+                    validation-error-details, error-recovery-suggestion};
+    
+    /// Create a new error with context
+    /// 
+    /// Primary error creation function for all Flight systems
+    create-error: func(
+        severity: error-severity,
+        category: error-category,
+        message: string,
+        context: error-context
+    ) -> flight-error;
+    
+    /// Create error with simple context
+    /// 
+    /// Convenience function for basic error creation
+    create-simple-error: func(
+        severity: error-severity,
+        category: error-category,
+        message: string,
+        source: string,
+        operation: string
+    ) -> flight-error;
+    
+    /// Create service integration error
+    /// 
+    /// Specialized function for external service errors
+    create-service-error: func(
+        service-code: service-error-code,
+        message: string,
+        service-id: string,
+        session-id: option<string>
+    ) -> flight-error;
+    
+    /// Create platform error
+    /// 
+    /// Specialized function for platform-specific errors
+    create-platform-error: func(
+        platform-code: platform-error-code,
+        message: string,
+        platform: string,
+        operation: string
+    ) -> flight-error;
+    
+    /// Create network error
+    /// 
+    /// Specialized function for network-related errors
+    create-network-error: func(
+        network-code: network-error-code,
+        message: string,
+        endpoint: option<string>
+    ) -> flight-error;
+    
+    /// Create validation error
+    /// 
+    /// Specialized function for validation errors
+    create-validation-error: func(
+        message: string,
+        validation-details: list<validation-error-details>
+    ) -> flight-error;
+    
+    /// Add context to existing error
+    /// 
+    /// Enriches error information as it propagates
+    enrich-error: func(
+        error: flight-error,
+        additional-context: list<tuple<string, string>>
+    ) -> flight-error;
+    
+    /// Chain errors (add causative error)
+    /// 
+    /// Links errors in a causal chain
+    chain-error: func(
+        error: flight-error,
+        cause: flight-error
+    ) -> flight-error;
+    
+    /// Check if error is recoverable
+    /// 
+    /// Determines if operation can be retried
+    is-recoverable: func(error: flight-error) -> bool;
+    
+    /// Get error recovery suggestions
+    /// 
+    /// Provides actionable recovery suggestions
+    get-recovery-suggestions: func(error: flight-error) -> list<error-recovery-suggestion>;
+    
+    /// Get error summary
+    /// 
+    /// Human-readable error summary for logging/UI
+    get-error-summary: func(error: flight-error) -> string;
+    
+    /// Collect multiple errors
+    /// 
+    /// Aggregates errors from batch operations
+    collect-errors: func(errors: list<flight-error>) -> error-collection;
+    
+    /// Filter errors by severity
+    /// 
+    /// Extracts errors matching severity criteria
+    filter-by-severity: func(
+        collection: error-collection,
+        min-severity: error-severity
+    ) -> list<flight-error>;
+    
+    /// Filter errors by category
+    /// 
+    /// Extracts errors matching category criteria
+    filter-by-category: func(
+        collection: error-collection,
+        categories: list<error-category>
+    ) -> list<flight-error>;
+    
+    /// Convert error to JSON
+    /// 
+    /// Serializes error for API integration and storage
+    error-to-json: func(error: flight-error) -> string;
+    
+    /// Parse error from JSON
+    /// 
+    /// Deserializes error from API responses or storage
+    error-from-json: func(json: string) -> flight-result<flight-error>;
+    
+    /// Validate error structure
+    /// 
+    /// Ensures error meets structural requirements
+    validate-error: func(error: flight-error) -> flight-result<bool>;
+}
+
+/// Error reporting and analytics interface
+/// 
+/// Error tracking and analysis capabilities
+interface error-analytics {
+    use error-types.{flight-error, error-collection, error-severity, error-category};
+    
+    /// Error analytics summary
+    record error-analytics-summary {
+        /// Total error count
+        total-errors: u32,
+        /// Errors by severity
+        by-severity: list<tuple<error-severity, u32>>,
+        /// Errors by category
+        by-category: list<tuple<error-category, u32>>,
+        /// Most common error messages
+        top-errors: list<tuple<string, u32>>,
+        /// Error rate (errors per time period)
+        error-rate: f32,
+        /// Time window for this analysis (seconds)
+        time-window: u64,
+        /// Analysis timestamp
+        analyzed-at: u64,
+    }
+    
+    /// System health status based on error patterns
+    enum system-health-status {
+        /// System operating normally
+        healthy,
+        /// Some issues but system functioning
+        degraded,
+        /// Serious issues affecting functionality
+        critical,
+        /// System experiencing significant failures
+        failing,
+    }
+    
+    /// Error trend analysis
+    record error-trend-analysis {
+        /// Trend direction
+        trend: trend-direction,
+        /// Confidence in trend analysis (0.0-1.0)
+        confidence: f32,
+        /// Predicted error rate for next period
+        predicted-rate: f32,
+        /// Recommendations based on trend
+        recommendations: list<string>,
+    }
+    
+    /// Trend direction
+    enum trend-direction {
+        /// Error rate increasing
+        increasing,
+        /// Error rate decreasing
+        decreasing,
+        /// Error rate stable
+        stable,
+        /// Error rate highly variable
+        volatile,
+    }
+    
+    /// Generate error analytics
+    /// 
+    /// Analyzes error patterns for system health monitoring
+    analyze-errors: func(
+        errors: list<flight-error>,
+        time-window: u64
+    ) -> error-analytics-summary;
+    
+    /// Check system health based on errors
+    /// 
+    /// Determines system health from error patterns
+    assess-system-health: func(
+        analytics: error-analytics-summary
+    ) -> system-health-status;
+    
+    /// Analyze error trends
+    /// 
+    /// Provides trend analysis and predictions
+    analyze-error-trends: func(
+        error-history: list<error-analytics-summary>
+    ) -> error-trend-analysis;
+    
+    /// Get error hotspots
+    /// 
+    /// Identifies components/operations with high error rates
+    get-error-hotspots: func(
+        analytics: error-analytics-summary
+    ) -> list<tuple<string, u32>>;
+    
+    /// Generate error report
+    /// 
+    /// Comprehensive error report for analysis
+    generate-error-report: func(
+        analytics: error-analytics-summary,
+        include-details: bool
+    ) -> string;
+}
+
+/// Flight Error World - Component Model entry point
+world flight-error {
+    export error-types;
+    export error-operations;
+    export error-analytics;
+}

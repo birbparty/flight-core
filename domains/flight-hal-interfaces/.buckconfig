@@ -1,0 +1,23 @@
+[cells]
+root = .
+prelude = buck2/prelude
+config = buck2/prelude
+toolchains = buck2/prelude
+
+[parser]
+target_platform_detector_spec = target:root//...->prelude//platforms:default
+
+[build]
+execution_platforms = prelude//platforms:default
+
+[cxx]
+default_platform = prelude//platforms:default
+
+[project]
+ignore = .git
+
+[ui]
+superconsole = enabled
+
+[buck2]
+materializations = deferred

@@ -1,0 +1,17 @@
+team_info:
+  name: "HAL Minimal Test Team"
+  purpose: "Test core HAL functionality across all platforms"
+  
+dependencies:
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "All core interfaces"
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features:
+      - "Memory test interfaces"
+  - project: "flight-hal-time-interface"
+    team: "HAL Time Interface Team"
+    features:
+      - "Time test interfaces"

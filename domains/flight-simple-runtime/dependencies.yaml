@@ -1,0 +1,140 @@
+team_info:
+  name: "Flight Simple Runtime Team"
+  purpose: "Build lightweight wasm3-based runtime for flattened WASM modules"
+  critical_path: true
+  
+dependencies:
+  - project: "flight-component-flattener"
+    team: "Flight Component Flattener Team"
+    features_needed:
+      - "Flattened WASM modules"
+      - "Module metadata"
+      - "Memory layout information"
+    blocker: true
+    why: "Cannot execute without flattened modules"
+    
+  - project: "flight-memory-layout"
+    team: "Flight Memory Layout Team"
+    features_needed:
+      - "Memory initialization routines"
+      - "Segment allocation info"
+      - "Guard page setup"
+    blocker: true
+    why: "Need memory layout for runtime initialization"
+    
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features_needed:
+      - "Platform abstraction"
+      - "Driver interfaces"
+      - "Error types"
+    blocker: false
+    why: "Need HAL for host function implementation"
+    
+  - project: "All Platform HAL implementations"
+    team: "Platform-specific HAL teams"
+    features_needed:
+      - "Platform drivers"
+      - "Memory management"
+      - "I/O operations"
+    blocker: false
+    why: "Need platform implementations to run"
+
+what_we_provide:
+  - feature: "WASM execution runtime"
+    consumers:
+      - "Game developers"
+      - "Platform teams"
+      - "Test teams"
+    format: "C++ library with simple API"
+    
+  - feature: "Host function bridge"
+    consumers:
+      - "Game developers"
+    format: "Extensible host API"
+    
+  - feature: "Debug hooks"
+    consumers:
+      - "Flight Debug Instrumentation Team"
+      - "Developer tools"
+    format: "Debug callbacks and trace API"
+    
+  - feature: "Performance metrics"
+    consumers:
+      - "Platform optimization teams"
+      - "Game developers"
+    format: "Runtime statistics API"
+
+blocks:
+  - team: "All game developers"
+    why: "They need runtime to execute games"
+    impact: "Cannot test or deploy games"
+    
+  - team: "Platform validation teams"
+    why: "They need runtime to validate implementations"
+    impact: "Cannot verify platform compatibility"
+
+deliverables:
+  phase_1:
+    - "Basic wasm3 integration"
+    - "Module loading"
+    - "Simple host functions"
+    
+  phase_2:
+    - "Memory layout integration"
+    - "Full HAL integration"
+    - "Platform optimizations"
+    
+  phase_3:
+    - "Debug support"
+    - "Performance profiling"
+    - "Advanced optimizations"
+
+external_dependencies:
+  - name: "wasm3"
+    version: "0.5.0"
+    purpose: "Core WebAssembly interpreter"
+    license: "MIT"
+    integration: "Embedded source"
+    
+  - name: "Flight Core HAL"
+    version: "internal"
+    purpose: "Platform abstraction"
+    license: "MIT"
+
+technical_requirements:
+  language: "C++14"
+  build_system: "CMake 3.14+"
+  constraints:
+    - "No exceptions"
+    - "No RTTI"
+    - "No STL on some platforms"
+    - "Static linking only"
+  
+performance_requirements:
+  - "Startup: < 100ms on PSP"
+  - "Call overhead: < 1μs"
+  - "Memory: < 500KB overhead"
+  - "60fps on all platforms"
+
+platform_specific:
+  - platform: "PSX"
+    constraints:
+      - "No FPU"
+      - "2MB RAM total"
+      - "No dynamic allocation"
+      
+  - platform: "PSP"
+    constraints:
+      - "32-64MB RAM"
+      - "Media Engine consideration"
+      
+  - platform: "Dreamcast"
+    constraints:
+      - "Big-endian CPU"
+      - "Special VRAM handling"
+      
+  - platform: "Modern"
+    constraints:
+      - "JIT opportunity"
+      - "Multi-threading possible"

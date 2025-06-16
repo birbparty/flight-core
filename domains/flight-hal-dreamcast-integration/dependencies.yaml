@@ -1,0 +1,14 @@
+team_info:
+  name: "dreamcast Platform Integration Team"
+  purpose: "Integrate all dreamcast subsystems into cohesive platform"
+  
+dependencies:
+  - project: "flight-hal-dreamcast-memory"
+    team: "dreamcast Memory Team"
+    features:
+      - "Complete memory management"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Platform interface"
+      - "Driver registry"

@@ -1,0 +1,78 @@
+// Platform Memory Profiles - Platform-specific configurations
+package flight:memory@0.1.0;
+
+interface platforms {
+  use core.{memory-size, memory-alignment};
+  use regions.{memory-region};
+  use capabilities.{capability-set};
+  
+  // Platform tiers based on capabilities
+  enum platform-tier {
+    retro,      // PSX, Dreamcast, PSP - extreme constraints
+    modern,     // Windows, macOS, Linux - full features
+    mobile,     // iOS, Android - battery aware
+    embedded,   // Microcontrollers - minimal features
+    web,        // Browser-based - sandboxed
+  }
+  
+  // Memory constraints for a platform
+  record memory-constraints {
+    max-total-memory: memory-size,
+    max-allocation-size: memory-size,
+    min-allocation-size: memory-size,
+    alignment-requirements: list<memory-alignment>,
+    page-size: u32,
+  }
+  
+  // Static memory layout for platforms without dynamic allocation
+  record static-memory-layout {
+    wasm-heap: memory-size,
+    component-heap: memory-size,
+    system-heap: memory-size,
+    stack-size: memory-size,
+  }
+  
+  // Complete platform memory profile
+  record platform-profile {
+    name: string,
+    tier: platform-tier,
+    total-memory: memory-size,
+    regions: list<memory-region>,
+    capabilities: capability-set,
+    constraints: memory-constraints,
+    static-layout: option<static-memory-layout>,  // For retro platforms
+  }
+  
+  // Memory allocation strategy recommendation
+  enum allocation-strategy {
+    ultra-conservative,  // Every byte counts (PSX)
+    conservative,        // Limited memory (Dreamcast)
+    balanced,            // Moderate constraints (PSP)
+    aggressive,          // Plenty of memory (modern)
+  }
+  
+  // Platform-specific memory usage recommendations
+  record memory-recommendations {
+    strategy: allocation-strategy,
+    pool-sizes: list<memory-size>,      // Recommended pool sizes
+    reserve-percentage: u8,             // % to keep in reserve
+    max-fragmentation: float32,         // Maximum acceptable fragmentation
+  }
+  
+  // Platform query functions
+  
+  // Get profile for a specific platform
+  get-profile: func(platform: string) -> result<platform-profile, string>;
+  
+  // List all supported platforms
+  list-platforms: func() -> list<string>;
+  
+  // Get platforms by tier
+  get-platforms-by-tier: func(tier: platform-tier) -> list<string>;
+  
+  // Get memory recommendations for platform
+  get-recommendations: func(platform: string) -> result<memory-recommendations, string>;
+  
+  // Check if platform meets minimum requirements
+  meets-requirements: func(platform: string, min-memory: memory-size) -> bool;
+}

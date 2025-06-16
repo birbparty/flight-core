@@ -1,0 +1,10 @@
+team_info:
+  name: "HAL I/O Interface Team"
+  purpose: "Define file, stream, and storage interfaces"
+  
+dependencies:
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Base types and error handling"
+      - "Result type for I/O operations"

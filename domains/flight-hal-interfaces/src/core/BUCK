@@ -1,0 +1,111 @@
+# Core HAL functionality
+
+cxx_library(
+    name = "driver-registry",
+    srcs = ["driver_registry.cpp"],
+    headers = [
+        "//include/flight/hal/core:driver_registry.hpp",
+        "//include/flight/hal/core:driver_registry_impl.hpp",
+    ],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "driver-auto-registration", 
+    headers = ["//include/flight/hal/core:driver_auto_registration.hpp"],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    deps = [":driver-registry"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "platform-detection",
+    srcs = ["platform_detection.cpp"],
+    headers = ["//include/flight/hal/core:platform_detection.hpp"],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "platform-capabilities",
+    srcs = ["platform_capabilities.cpp"],  
+    headers = ["//include/flight/hal/core:platform_capabilities.hpp"],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    deps = [":platform-detection"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "hal-capabilities",
+    srcs = ["hal_capabilities.cpp"],
+    headers = ["//include/flight/hal/core:hal_capabilities.hpp"],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    deps = [":platform-capabilities"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "error-handling",
+    srcs = ["error_handling.cpp"],
+    headers = [
+        "//include/flight/hal/core:hal_error.hpp",
+        "//include/flight/hal/core:hal_result.hpp", 
+        "//include/flight/hal/core:hal_error_macros.hpp",
+    ],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "hal-logging",
+    headers = ["//include/flight/hal/core:hal_logging.hpp"],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    deps = [":error-handling"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "event-system",
+    srcs = ["event_system.cpp"],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    deps = [":hal-logging"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "resource-manager",
+    srcs = ["resource_manager.cpp"],
+    compiler_flags = ["-std=c++17"],
+    preprocessor_flags = ["-DFLIGHT_HAL_CORE"],
+    deps = [
+        ":error-handling",
+        ":hal-capabilities",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+# Combined core library
+cxx_library(
+    name = "hal-core",
+    deps = [
+        ":driver-registry",
+        ":driver-auto-registration",
+        ":platform-detection", 
+        ":platform-capabilities",
+        ":hal-capabilities",
+        ":error-handling",
+        ":hal-logging",
+        ":event-system",
+        ":resource-manager",
+    ],
+    visibility = ["PUBLIC"],
+)

@@ -1,0 +1,19 @@
+team_info:
+  name: "Dreamcast PowerVR2 Team"
+  purpose: "Implement Dreamcast tile-based rendering"
+  
+dependencies:
+  - project: "flight-hal-graphics-interface"
+    team: "HAL Graphics Interface Team"
+    features:
+      - "Graphics context interface"
+      - "Render surface abstraction"
+  - project: "flight-hal-dreamcast-memory"
+    team: "Dreamcast Memory Team"
+    features:
+      - "VRAM allocation"
+      - "Texture memory management"
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Dreamcast platform types"

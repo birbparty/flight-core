@@ -1,0 +1,9 @@
+team_info:
+  name: "HAL Time Interface Team"
+  purpose: "Define timing, clock, and synchronization interfaces"
+  
+dependencies:
+  - project: "flight-hal-interfaces"
+    team: "HAL Core Interfaces Team"
+    features:
+      - "Base types and error handling"

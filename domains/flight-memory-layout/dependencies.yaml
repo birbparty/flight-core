@@ -1,0 +1,117 @@
+team_info:
+  name: "Flight Memory Layout Team"
+  purpose: "Provide memory layout algorithms for safe component memory merging"
+  critical_path: true
+  
+dependencies:
+  - project: "flight-memory-components"
+    team: "Flight Memory Components Team"
+    features_needed:
+      - "Memory type definitions (memory-size, memory-address)"
+      - "Memory region types (region-type enum)"
+      - "Platform memory constants"
+      - "Alignment validators"
+    blocker: false
+    why: "Need standardized types for cross-platform compatibility"
+    
+  - project: "flight-hal-memory-interface"
+    team: "HAL Memory Interface Team"
+    features_needed:
+      - "Platform memory capabilities"
+      - "Memory allocation interfaces"
+    blocker: false
+    why: "Need to understand platform memory constraints"
+
+what_we_provide:
+  - feature: "Memory segment allocator"
+    consumers:
+      - "Flight Component Flattener Team"
+      - "Flight Simple Runtime Team"
+    format: "C++ header-only library"
+    
+  - feature: "Memory rebasing utilities"
+    consumers:
+      - "Flight Component Flattener Team"
+    format: "Binaryen-compatible utilities"
+    
+  - feature: "Platform memory profiles"
+    consumers:
+      - "All platform teams"
+      - "Flight Simple Runtime Team"
+    format: "Configuration templates"
+    
+  - feature: "Shared memory protocols"
+    consumers:
+      - "Flight Component Flattener Team"
+      - "Game developers"
+    format: "API and implementation"
+
+blocks:
+  - team: "Flight Component Flattener Team"
+    why: "They need our memory merging algorithms"
+    impact: "Cannot safely merge component memories"
+    
+  - team: "Flight Simple Runtime Team"
+    why: "They need memory layout for runtime initialization"
+    impact: "Cannot set up component memory spaces"
+
+deliverables:
+  phase_1:
+    - "Basic segment allocator"
+    - "Simple linear layout algorithm"
+    - "Memory alignment utilities"
+    
+  phase_2:
+    - "Guard page implementation"
+    - "Memory rebasing engine"
+    - "Platform-specific profiles"
+    
+  phase_3:
+    - "Shared memory regions"
+    - "Advanced packing algorithms"
+    - "Memory safety validators"
+
+external_dependencies:
+  - name: "Binaryen"
+    version: "latest"
+    purpose: "For memory instruction rewriting"
+    license: "Apache-2.0"
+    
+  - name: "GoogleTest"
+    version: "1.14+"
+    purpose: "Unit testing framework"
+    license: "BSD-3-Clause"
+
+technical_requirements:
+  language: "C++17"
+  library_type: "Header-only"
+  build_system: "CMake 3.14+"
+  standards:
+    - "Zero dependencies (except STL)"
+    - "Single-header option available"
+    - "Constexpr where possible"
+  
+performance_requirements:
+  - "Allocation: < 100ns"
+  - "Rebasing: < 1ms/MB"
+  - "Zero runtime overhead"
+  - "< 5% memory fragmentation"
+
+platform_support:
+  retro:
+    - platform: "PSX"
+      memory: "2MB main + 1MB VRAM"
+      constraints: "No MMU, fixed memory map"
+      
+    - platform: "PSP"
+      memory: "32-64MB main + 2MB VRAM"
+      constraints: "ME RAM separate"
+      
+    - platform: "Dreamcast"
+      memory: "16MB main + 8MB VRAM"
+      constraints: "Tile-based rendering"
+      
+  modern:
+    - platform: "PC/Console"
+      memory: "8GB+"
+      constraints: "Virtual memory, ASLR"

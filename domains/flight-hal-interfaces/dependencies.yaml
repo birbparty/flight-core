@@ -1,0 +1,103 @@
+# Flight HAL Interfaces Dependencies Configuration
+# This file defines the dependencies for the Flight HAL Interfaces project
+
+project:
+  name: flight-hal-interfaces
+  version: "1.0.0"
+  description: "Flight HAL Interface Definitions for Cross-Platform Hardware Abstraction"
+  type: interface-library
+  
+  # Flight ecosystem metadata
+  ecosystem:
+    domain: hal-interfaces
+    category: foundation
+    priority: critical
+    
+dependencies:
+  # Core Flight dependencies
+  flight-shared-types:
+    version: ">=1.0.0"
+    source: "flight-domains"
+    required: true
+    description: "Shared type definitions across Flight ecosystem"
+  
+  # Development dependencies
+  dev-dependencies:
+    gtest:
+      version: ">=1.12.0"
+      source: "external"
+      required: false
+      description: "Google Test framework for unit testing"
+      
+    gbenchmark:
+      version: ">=1.7.0"
+      source: "external"
+      required: false
+      description: "Google Benchmark for performance testing"
+      
+    doxygen:
+      version: ">=1.9.0"
+      source: "external"
+      required: false
+      description: "Documentation generation"
+
+# Platform-specific configurations
+platforms:
+  dreamcast:
+    toolchain: "kos"
+    memory_constraints:
+      max_ram: "16MB"
+      heap_limit: "8MB"
+    features:
+      threading: limited
+      dynamic_loading: false
+      
+  psp:
+    toolchain: "psp-dev"
+    memory_constraints:
+      max_ram: "32MB"
+      heap_limit: "16MB"
+    features:
+      threading: limited
+      dynamic_loading: false
+      
+  modern:
+    toolchains: ["gcc", "clang", "msvc"]
+    memory_constraints:
+      max_ram: "unlimited"
+      heap_limit: "unlimited"
+    features:
+      threading: full
+      dynamic_loading: true
+
+# Build system configuration
+build:
+  cmake:
+    minimum_version: "3.20"
+    standards:
+      cxx: 17
+    features:
+      - position_independent_code
+      - export_compile_commands
+      
+  buck2:
+    migration_ready: false
+    target_version: "2024.01.01"
+    
+# Testing configuration
+testing:
+  frameworks:
+    - gtest
+    - benchmark
+  categories:
+    - unit
+    - integration
+    - compliance
+    - stress
+    - performance
+  coverage:
+    target: 95%
+    exclude_patterns:
+      - "*/tests/*"
+      - "*/benchmarks/*"
+      - "*/examples/*"

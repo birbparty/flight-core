@@ -1,0 +1,44 @@
+{
+  "name": "@flight/pagination-types",
+  "version": "1.0.0",
+  "description": "TypeScript bindings for Flight pagination and list management types",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@flight/error-types": "^1.0.0",
+    "@flight/memory-types": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint": "^8.37.0",
+    "jest": "^29.5.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/punk1290/flight.git",
+    "directory": "domains/flight-shared-types/bindings/typescript/pagination"
+  },
+  "keywords": [
+    "flight",
+    "v6r",
+    "pagination",
+    "list-management",
+    "typescript"
+  ],
+  "author": "Flight Team",
+  "license": "MIT"
+}

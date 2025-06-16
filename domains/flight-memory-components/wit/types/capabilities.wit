@@ -1,0 +1,51 @@
+// Memory Capability System - Runtime feature detection
+package flight:memory@0.1.0;
+
+interface capabilities {
+  // Memory-related capabilities a platform might support
+  enum memory-capability {
+    dynamic-allocation,   // malloc/free support
+    virtual-memory,       // Virtual address spaces
+    memory-protection,    // Page protection (R/W/X)
+    dma-support,          // Direct Memory Access
+    cache-control,        // Cache flush/invalidate
+    memory-mapping,       // mmap support
+    shared-memory,        // IPC shared memory
+    huge-pages,           // Large page support
+    memory-barriers,      // Memory fence instructions
+    atomic-operations,    // Atomic memory operations
+  }
+  
+  // Set of capabilities for a platform
+  record capability-set {
+    platform: string,
+    version: string,
+    capabilities: list<memory-capability>,
+  }
+  
+  // Query result for capability checks
+  record capability-query {
+    capability: memory-capability,
+    supported: bool,
+    details: option<string>,  // Platform-specific details
+  }
+  
+  // Runtime capability detection functions
+  
+  // Check if platform supports a specific capability
+  has-capability: func(platform: string, capability: memory-capability) -> bool;
+  
+  // Get all capabilities for a platform
+  get-capabilities: func(platform: string) -> result<capability-set, string>;
+  
+  // Query detailed information about a capability
+  query-capability: func(platform: string, capability: memory-capability) 
+    -> result<capability-query, string>;
+  
+  // Check if a set of capabilities are all supported
+  supports-all: func(platform: string, required: list<memory-capability>) -> bool;
+  
+  // Get capabilities that are missing from requirements
+  missing-capabilities: func(platform: string, required: list<memory-capability>) 
+    -> list<memory-capability>;
+}

@@ -1,0 +1,19 @@
+{
+  "name": "flight-hal-test-audio",
+  "projectType": "library",
+  "sourceRoot": "teams/flight-hal-test-audio//src",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/cmake:build",
+      "options": {
+        "buildDirectory": "build"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/cmake:test",
+      "options": {
+        "testDirectory": "build/tests"
+      }
+    }
+  }
+}
