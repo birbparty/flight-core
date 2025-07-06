@@ -1,0 +1,15 @@
+# Basic Makefile for Dreamcast development with KOS
+TARGET = hello_dreamcast
+OBJS = test_dreamcast_hello.o
+
+all: $(TARGET).elf
+
+include $(KOS_BASE)/Makefile.rules
+
+clean:
+	-rm -f $(TARGET).elf $(OBJS)
+
+$(TARGET).elf: $(OBJS)
+	$(KOS_CC) $(KOS_CFLAGS) $(KOS_LDFLAGS) -o $@ $(KOS_START) $^ $(OBJEXTRA) $(KOS_LIBS)
+
+.PHONY: clean
